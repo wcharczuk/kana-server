@@ -47,17 +47,14 @@ func (m *Model) GetQuiz(_ context.Context, id uuid.UUID) (types.Quiz, error) {
 	return types.Quiz{}, ErrNotFound
 }
 
-// AddQuizResult adds a quiz result.
-func (m *Model) AddQuizResult(_ context.Context, qr types.QuizResult) error {
+// UpdateQuiz updates a quiz.
+func (m *Model) UpdateQuiz(_ context.Context, q types.Quiz) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-
 	if m.data == nil {
 		return ErrNotFound
 	}
-	if value, found := m.data[qr.QuizID.String()]; found {
-		value.Results = append(value.Results, qr)
-	}
+	m.data[q.ID.String()] = &q
 	return nil
 }
 

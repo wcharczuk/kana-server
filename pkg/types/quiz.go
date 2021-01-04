@@ -21,8 +21,24 @@ type Quiz struct {
 	MaxPrompts int
 	// MaxQuestions is the maximum number of questions to ask per quiz.
 	MaxQuestions int
+	// MaxRepeatHistory is the debounce history list length.
+	MaxRepeatHistory int
 	// Results are the individual prompts and answers.
 	Results []QuizResult
+	// Prompts are the individual mappings between kana and roman to quiz.
+	Prompts map[string]string
+	// PromptWeights are used for selection bias based on incorrect answers.
+	PromptWeights map[string]float64
+	// PromptHistory are the recent prompts used to debounce them.
+	PromptHistory []string
+}
+
+// LatestResult returns the latest result.
+func (q Quiz) LatestResult() *QuizResult {
+	if len(q.Results) > 0 {
+		return &q.Results[len(q.Results)-1]
+	}
+	return nil
 }
 
 // ElapsedTimes returns the elapsed time aggregates.
