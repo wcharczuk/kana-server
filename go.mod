@@ -1,4 +1,4 @@
-module github.com/wcharczuk/kana
+module github.com/wcharczuk/kana-server
 
 go 1.15
 

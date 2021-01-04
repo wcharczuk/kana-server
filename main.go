@@ -1,28 +1,37 @@
 package main
 
 import (
-	"context"
-
 	"github.com/blend/go-sdk/configutil"
+	"github.com/blend/go-sdk/graceful"
 	"github.com/blend/go-sdk/logger"
 	"github.com/blend/go-sdk/web"
+
+	"github.com/wcharczuk/kana-server/pkg/config"
+	"github.com/wcharczuk/kana-server/pkg/controller"
+	"github.com/wcharczuk/kana-server/pkg/local"
 )
 
-// Config is the application config type.
-type Config struct {
-	Logger logger.Config `yaml:"logger"`
-	Web    web.Config    `yaml:"web"`
-}
-
-// Resolve resolves the config.
-func (c *Config) Resolve(ctx context.Context) error {
-	return configutil.Resolve(ctx,
-		(&c.Logger).Resolve,
-		(&c.Web).Resolve,
-	)
-}
-
 func main() {
-	var cfg Config
+	var cfg config.Config
 	configutil.MustRead(&cfg)
+
+	log := logger.MustNew(
+		logger.OptConfig(cfg.Logger),
+		logger.OptAll(),
+	)
+	server := web.MustNew(
+		web.OptConfig(cfg.Web),
+		web.OptLog(log),
+	)
+
+	model := new(local.Model)
+
+	server.Register(
+		controller.Index{Config: cfg},
+		controller.Quiz{Model: model},
+	)
+
+	if err := graceful.Shutdown(server); err != nil {
+		logger.MaybeFatalExit(log, err)
+	}
 }
