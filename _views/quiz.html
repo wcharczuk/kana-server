@@ -1,30 +1,69 @@
 {{ define "quiz" }} {{ template "header" . }}
-<div class="content">
-    <h1>Quiz</h1>
+<div class="container">
+    <h1 class="bp3-heading">Quiz</h1>
     <div class="row">
         <div class="four columns align-center">
             <div class="latest-result">
                 {{ $latest := .ViewModel.Quiz.LatestResult }}
                 {{ if $latest }}
                 {{ if $latest.Correct }}
-                <h4 class="bt3-intent-success">Correct</h2>
+                <h4 class="bp3-heading text-intent-success">Correct</h2>
                 {{ else }}
-                <h4 class="bt3-intent-danger">Incorrect</h2>
+                <h4 class="bp3-heading text-intent-danger">Incorrect</h2>
+                <div>{{ $latest.Prompt }} is {{ $latest.Expected }}</div>
                 {{ end }}
                 {{ else }}
-                <h4>No Result</h2>
+                <h4 class="bp3-heading">&nbsp;</h4>
                 {{ end }}
             </div>
         </div>
-        <div class="four columns align-center">
+        <div class="four columns align-center bp3-card">
             <form class="bp3-form" method="POST" action="/quiz/{{ .ViewModel.Quiz.ID }}/answer">
                 <input type="hidden" name="createdUTC" value="{{ .ViewModel.CreatedUTC | unix_nano }}" />
                 <input type="hidden" name="prompt" value="{{ .ViewModel.Prompt }}" />
                 <input type="hidden" name="expected" value="{{ .ViewModel.Expected }}" />
-                <h2>{{ .ViewModel.Prompt }}</h2>
+                <h1>{{ .ViewModel.Prompt }}</h1>
                 <input type="text" name="actual" class="bp3-input bp3-large bp3-fill" dir="auto" />
                 <input type="submit" style="display: none" />
             </form>
+        </div>
+        <div class="four columns">
+            <div class="bp3-card">
+                <h6 class="bp3-heading">Quiz Settings</h6>
+                {{ if .ViewModel.Quiz.Hiragana }}
+                <div>
+                    <label>Include Hiragana</label>
+                </div>
+                {{ end }}
+                {{ if .ViewModel.Quiz.Katakana }}
+                <div>
+                    <label>Include Katakana</label>
+                </div>
+                {{ end }}
+                <div>
+                    <label>Max Questions</label>
+                    {{ .ViewModel.Quiz.MaxQuestions }}
+                </div>
+                <div>
+                    <label>Max Prompt Count</label>
+                    {{ .ViewModel.Quiz.MaxPrompts }}
+                </div>
+                <div>
+                    <label>Max Repeat History</label>
+                    {{ .ViewModel.Quiz.MaxRepeatHistory }}
+                </div>
+            </div>
+            <div class="bp3-card">
+                {{ $stats := .ViewModel.Quiz.Stats }}
+                <h6 class="bp3-heading">Stats</h6>
+                <div>
+                    <div style="font-weight: bold">{{ $stats.Correct }} / {{ $stats.Total }}</div>
+                </div>
+                <div>
+                    Avg: {{ $stats.ElapsedAverage | duration_round_millis }} P90: {{ $stats.ElapsedP90 | duration_round_millis }}
+                </div>
+
+            </div>
         </div>
     </div>
 </div>

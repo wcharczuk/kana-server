@@ -1,6 +1,11 @@
 {{ define "index" }} {{ template "header" . }}
-<div class="content">
-    <h1>INDEX</h1>
+<div class="container">
+    <div class="row">
+        <div class="six columns offset-by-three index-container">
+        <h1>Kana Quiz</h1>
+        <a role="button" class="bp3-button bp3-intent-success" href="/quiz.new">Start new quiz</a>
+        </div>
+    </div>
 </div>
 {{ template "footer" . }}
 {{ end }}

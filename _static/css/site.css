@@ -7,3 +7,16 @@
 .align-right {
     text-align: right;
 }
+
+.text-intent-primary {
+    color:#0E5A8A;    
+}
+.text-intent-success {
+    color: #0A6640;    
+}
+.text-intent-warning {
+    color: #A66321;    
+}
+.text-intent-danger {
+    color: #A82A2A;    
+}

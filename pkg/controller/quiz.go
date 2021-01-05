@@ -87,7 +87,6 @@ func (q Quiz) getQuiz(r *web.Ctx) web.Result {
 	for kana.ListHas(quiz.PromptHistory, prompt) {
 		prompt, expected = kana.SelectWeighted(quiz.Prompts, quiz.PromptWeights)
 	}
-	kana.ListAddFixedLength(quiz.PromptHistory, prompt, quiz.MaxRepeatHistory)
 	return r.Views.View("quiz", types.QuizPrompt{
 		Quiz:       quiz,
 		CreatedUTC: time.Now().UTC(),
@@ -131,16 +130,17 @@ func (q Quiz) postQuizAnswer(r *web.Ctx) web.Result {
 		Expected:    expected,
 		Actual:      actual,
 	}
+	quiz.Results = append(quiz.Results, quizResult)
+
 	if quizResult.Correct() {
 		kana.DecreaseWeight(quiz.PromptWeights, prompt)
 	} else {
 		kana.IncreaseWeight(quiz.PromptWeights, prompt)
 	}
-	quiz.Results = append(quiz.Results, quizResult)
 
+	quiz.PromptHistory = kana.ListAddFixedLength(quiz.PromptHistory, prompt, quiz.MaxRepeatHistory)
 	if err := q.Model.UpdateQuiz(r.Context(), quiz); err != nil {
 		return r.Views.InternalError(err)
 	}
-
 	return web.RedirectWithMethodf(http.MethodGet, "/quiz/%s", quiz.ID.String())
 }
