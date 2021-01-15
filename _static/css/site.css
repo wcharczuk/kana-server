@@ -20,3 +20,35 @@
 .text-intent-danger {
     color: #A82A2A;    
 }
+
+.nav {
+    padding-top: 10px;
+    height: 75px;
+    border-bottom: 1px solid #efefef;
+    margin-bottom: 15px;
+}
+
+.nav .nav-hero a {
+    text-decoration: none;
+}
+.nav .nav-hero a:hover {
+    text-decoration: none;
+}
+
+.bp3-card {
+    margin-bottom: 15px;
+}
+
+/* specific page sections */
+
+.quiz-prompt {
+    font-size: 3rem;
+}
+
+.latest-result {
+    padding-top: 15px;
+}
+
+.stats h6:not(:first) {
+    margin-top: 10px;
+}

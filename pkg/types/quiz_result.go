@@ -9,13 +9,17 @@ import (
 
 // Quiz is a quiz result.
 type QuizResult struct {
-	QuizID      uuid.UUID
-	CreatedUTC  time.Time
-	AnsweredUTC time.Time
-	Prompt      string
-	Expected    string
-	Actual      string
+	ID          uuid.UUID `db:"id,pk"`
+	QuizID      uuid.UUID `db:"quiz_id"`
+	CreatedUTC  time.Time `db:"created_utc"`
+	AnsweredUTC time.Time `db:"answered_utc"`
+	Prompt      string    `db:"prompt"`
+	Expected    string    `db:"expected"`
+	Actual      string    `db:"actual"`
 }
+
+// TableName returns the database tablename for the type.
+func (qr QuizResult) TableName() string { return "quiz_result " }
 
 // Elapsed returns the elapsed time as a duration from the answered to the created times.
 func (qr QuizResult) Elapsed() time.Duration {

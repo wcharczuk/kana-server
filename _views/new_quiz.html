@@ -1,6 +1,6 @@
 {{ define "new_quiz" }} {{ template "header" . }}
 <div class="container">
-    <h1>Start a new quiz</h1>
+    <h4 class="bp3-heading">Start a new quiz</h4>
     <div class="row">
         <div class="four columns offset-by-four">
             <form class="bp3-form" method="POST" action="/quiz">
@@ -34,6 +34,13 @@
                         <input id="katakana" name="katakana" type="checkbox" dir="auto" checked="true" />
                         <span class="bp3-control-indicator"></span>
                         Include Katakana?
+                    </label>
+                </div>
+                <div class="bp3-form-group">
+                    <label class="bp3-control bp3-checkbox bp3-align-right bp3-large">
+                        <input id="katakanaWords" name="katakanaWords" type="checkbox" dir="auto" checked="true" />
+                        <span class="bp3-control-indicator"></span>
+                        Include Katakana Words?
                     </label>
                 </div>
                 <div class="u-pull-right">

@@ -1,68 +1,109 @@
 {{ define "quiz" }} {{ template "header" . }}
-<div class="container">
-    <h1 class="bp3-heading">Quiz</h1>
+<div class="container quiz">
     <div class="row">
+
         <div class="four columns align-center">
             <div class="latest-result">
                 {{ $latest := .ViewModel.Quiz.LatestResult }}
                 {{ if $latest }}
                 {{ if $latest.Correct }}
-                <h4 class="bp3-heading text-intent-success">Correct</h2>
+                <h1 class="bp3-heading text-intent-success">Correct</h1>
+                <h1>{{ $latest.Prompt }} is {{ $latest.Expected }}</h1>
                 {{ else }}
-                <h4 class="bp3-heading text-intent-danger">Incorrect</h2>
-                <div>{{ $latest.Prompt }} is {{ $latest.Expected }}</div>
+                <h1 class="bp3-heading text-intent-danger">Incorrect</h1>
+                <h1>{{ $latest.Prompt }} is {{ $latest.Expected }}</h1>
                 {{ end }}
                 {{ else }}
-                <h4 class="bp3-heading">&nbsp;</h4>
+                <h4 class="bp3-heading bp3-text-muted">No Answers Yet</h4>
                 {{ end }}
             </div>
         </div>
+
         <div class="four columns align-center bp3-card">
-            <form class="bp3-form" method="POST" action="/quiz/{{ .ViewModel.Quiz.ID }}/answer">
+            <form class="bp3-form" method="POST" action="/quiz/{{ .ViewModel.Quiz.ID }}/answer" autocomplete="off">
                 <input type="hidden" name="createdUTC" value="{{ .ViewModel.CreatedUTC | unix_nano }}" />
                 <input type="hidden" name="prompt" value="{{ .ViewModel.Prompt }}" />
                 <input type="hidden" name="expected" value="{{ .ViewModel.Expected }}" />
-                <h1>{{ .ViewModel.Prompt }}</h1>
-                <input type="text" name="actual" class="bp3-input bp3-large bp3-fill" dir="auto" />
+                <h1 class="quiz-prompt">{{ .ViewModel.Prompt }}</h1>
+                <input type="text" name="actual" class="bp3-input bp3-large bp3-fill" dir="auto" tabindex="0" autofocus/>
                 <input type="submit" style="display: none" />
             </form>
         </div>
-        <div class="four columns">
+
+        <div class="four columns quiz-stats-sidebar bp3-text-small">
+            <!-- quiz settings -->
             <div class="bp3-card">
-                <h6 class="bp3-heading">Quiz Settings</h6>
+                <h6 class="bp3-heading">Quiz</h6>
                 {{ if .ViewModel.Quiz.Hiragana }}
-                <div>
-                    <label>Include Hiragana</label>
+                <div class="row">
+                    <label class="bp3-text-muted six columns">Includes Hiragana</label>
                 </div>
                 {{ end }}
                 {{ if .ViewModel.Quiz.Katakana }}
-                <div>
-                    <label>Include Katakana</label>
+                <div class="row">
+                    <label class="bp3-text-muted six columns">Includes Katakana</label>
                 </div>
                 {{ end }}
-                <div>
-                    <label>Max Questions</label>
-                    {{ .ViewModel.Quiz.MaxQuestions }}
+                <div class="row">
+                    <label class="bp3-text-muted six columns">Max Questions</label>
+                    <div class="align-right">
+                        {{ .ViewModel.Quiz.MaxQuestions }}
+                    </div>
                 </div>
-                <div>
-                    <label>Max Prompt Count</label>
-                    {{ .ViewModel.Quiz.MaxPrompts }}
+                <div class="row">
+                    <label class="bp3-text-muted six columns">Max Prompt Count</label>
+                    <div class="align-right">
+                        {{ .ViewModel.Quiz.MaxPrompts }}
+                    </div>
                 </div>
-                <div>
-                    <label>Max Repeat History</label>
-                    {{ .ViewModel.Quiz.MaxRepeatHistory }}
+                <div class="row">
+                    <label class="bp3-text-muted six columns">Max Repeat History</label>
+                    <div class="align-right">
+                        {{ .ViewModel.Quiz.MaxRepeatHistory }}
+                    </div>
                 </div>
             </div>
+
+            <!-- quiz stats -->
             <div class="bp3-card">
                 {{ $stats := .ViewModel.Quiz.Stats }}
-                <h6 class="bp3-heading">Stats</h6>
-                <div>
-                    <div style="font-weight: bold">{{ $stats.Correct }} / {{ $stats.Total }}</div>
+                <h6 class="bp3-heading">Quiz Stats</h6>
+                <div class="row">
+                    <label class="bp3-text-muted six columns">Total</label>
+                    <div class="align-right six columns">
+                        {{ $stats.Correct }} / {{ $stats.Total }} / {{ $stats.PercentCorrect | mul 100 | printf "%.2f" }}%
+                    </div>
                 </div>
-                <div>
-                    Avg: {{ $stats.ElapsedAverage | duration_round_millis }} P90: {{ $stats.ElapsedP90 | duration_round_millis }}
+                <div class="row">
+                    <label class="bp3-text-muted six columns">Average</label>
+                    <div class="align-right six columns">
+                        {{ $stats.ElapsedAverage | duration_round_millis }} 
+                    </div>
                 </div>
+                <div class="row">
+                    <label class="bp3-text-muted six columns">90th Percentile</label>
+                    <div class="align-right six columns">
+                        {{ $stats.ElapsedP90 | duration_round_millis }}
+                    </div>
+                </div>
+            </div>
 
+            <!-- prompt stats -->
+            <div class="bp3-card">
+                {{ $promptStats := .ViewModel.Quiz.PromptStats }}
+                <h6 class="bp3-heading">Quiz Kana Stats</h6>
+                {{ range $index, $kana := $promptStats }}
+                <div class="row">
+                    <label class="bp3-text-muted six columns">{{ $kana.Prompt }}</label>
+                    <div class="align-right six columns">
+                        {{ $kana.PercentCorrect | mul 100 | printf "%.2f" }}%
+                    </div>
+                </div>
+                {{ else }}
+                <div class="row">
+                    <div class="bp3-text-muted twelve columns">No Answers Yet</div> 
+                </div>
+                {{ end }}
             </div>
         </div>
     </div>

@@ -1,0 +1,81 @@
+{{ define "stats" }} {{ template "header" . }}
+<div class="container stats">
+    <h4 class="bp3-heading">Stats</h4>
+    <div class="row">
+    {{ range $index, $quiz := .ViewModel }}
+        <div class="bp3-card">
+            <h6 class="bp3-heading">Quiz</h6>
+            {{ if $quiz.Hiragana }}
+            <div class="row">
+                <label class="bp3-text-muted six columns">Includes Hiragana</label>
+            </div>
+            {{ end }}
+            {{ if $quiz.Katakana }}
+            <div class="row">
+                <label class="bp3-text-muted six columns">Includes Katakana</label>
+            </div>
+            {{ end }}
+            <div class="row">
+                <label class="bp3-text-muted six columns">Max Questions</label>
+                <div class="align-right">
+                    {{ $quiz.MaxQuestions }}
+                </div>
+            </div>
+            <div class="row">
+                <label class="bp3-text-muted six columns">Max Prompt Count</label>
+                <div class="align-right">
+                    {{ $quiz.MaxPrompts }}
+                </div>
+            </div>
+            <div class="row">
+                <label class="bp3-text-muted six columns">Max Repeat History</label>
+                <div class="align-right">
+                    {{ $quiz.MaxRepeatHistory }}
+                </div>
+            </div>
+
+            {{ $stats := $quiz.Stats }}
+            <h6 class="bp3-heading">Quiz Stats</h6>
+            <div class="row">
+                <label class="bp3-text-muted six columns">Total</label>
+                <div class="align-right six columns">
+                    {{ $stats.Correct }} / {{ $stats.Total }}
+                </div>
+            </div>
+            <div class="row">
+                <label class="bp3-text-muted six columns">Average</label>
+                <div class="align-right six columns">
+                    {{ $stats.ElapsedAverage | duration_round_millis }} 
+                </div>
+            </div>
+            <div class="row">
+                <label class="bp3-text-muted six columns">90th Percentile</label>
+                <div class="align-right six columns">
+                    {{ $stats.ElapsedP90 | duration_round_millis }}
+                </div>
+            </div>
+
+            {{ $promptStats := $quiz.PromptStats }}
+            <h6 class="bp3-heading">Quiz Kana Stats</h6>
+            {{ range $kanaIndex, $kana := $promptStats }}
+            <div class="row">
+                <label class="bp3-text-muted six columns">{{ $kana.Prompt }}</label>
+                <div class="align-right six columns">
+                    {{ $kana.PercentCorrect | mul 100 | printf "%.2f" }}%
+                </div>
+            </div>
+            {{ else }}
+            <div class="row">
+                <div class="bp3-text-muted twelve columns">No Answers Yet</div> 
+            </div>
+            {{ end }}
+        </div>
+    {{ else }}
+        <div class="bp3-card">
+            <h2>No quizzes</h2>
+        </div>
+    {{ end }}
+    </div>
+</div>
+{{ template "footer" . }}
+{{ end }}

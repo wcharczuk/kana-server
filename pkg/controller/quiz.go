@@ -22,11 +22,23 @@ func (q Quiz) Register(app *web.App) {
 	app.Views.AddPaths(
 		"_views/quiz.html",
 		"_views/new_quiz.html",
+		"_views/stats.html",
 	)
 	app.GET("/quiz.new", q.getQuizNew)
 	app.POST("/quiz", q.postQuiz)
 	app.GET("/quiz/:id", q.getQuiz)
 	app.POST("/quiz/:id/answer", q.postQuizAnswer)
+
+	app.GET("/stats", q.getStats)
+}
+
+// GET /quiz.new
+func (q Quiz) getStats(r *web.Ctx) web.Result {
+	all, err := q.Model.All(r.Context())
+	if err != nil {
+		return r.Views.InternalError(err)
+	}
+	return r.Views.View("stats", all)
 }
 
 // GET /quiz.new
@@ -42,6 +54,7 @@ func (q Quiz) postQuiz(r *web.Ctx) web.Result {
 
 	includeHiragana, _ := r.Param("hiragana")
 	includeKatakana, _ := r.Param("katakana")
+	includeKatakanaWords, _ := r.Param("katakanaWords")
 
 	var inputs []map[string]string
 	if includeHiragana != "" {
@@ -49,6 +62,9 @@ func (q Quiz) postQuiz(r *web.Ctx) web.Result {
 	}
 	if includeKatakana != "" {
 		inputs = append(inputs, kana.Katakana)
+	}
+	if includeKatakanaWords != "" {
+		inputs = append(inputs, kana.KatakanaWords)
 	}
 	prompts := kana.SelectCount(kana.Merge(inputs...), maxPrompts)
 	promptWeights := kana.CreateWeights(prompts)
@@ -58,6 +74,7 @@ func (q Quiz) postQuiz(r *web.Ctx) web.Result {
 		CreatedUTC:       time.Now().UTC(),
 		Hiragana:         includeHiragana != "",
 		Katakana:         includeKatakana != "",
+		KatakanaWords:    includeKatakanaWords != "",
 		MaxPrompts:       maxPrompts,
 		MaxQuestions:     maxQuestions,
 		MaxRepeatHistory: maxRepeatHistory,
@@ -105,7 +122,6 @@ func (q Quiz) postQuizAnswer(r *web.Ctx) web.Result {
 	if err != nil {
 		return r.Views.InternalError(err)
 	}
-
 	createdUTC, err := web.Int64Value(r.Param("createdUTC"))
 	if err != nil {
 		return r.Views.BadRequest(err)
@@ -124,22 +140,24 @@ func (q Quiz) postQuizAnswer(r *web.Ctx) web.Result {
 	}
 
 	quizResult := types.QuizResult{
-		CreatedUTC:  time.Unix(0, createdUTC),
+		ID:          uuid.V4(),
+		QuizID:      quiz.ID,
+		CreatedUTC:  time.Unix(0, createdUTC).UTC(),
 		AnsweredUTC: time.Now().UTC(),
 		Prompt:      prompt,
 		Expected:    expected,
 		Actual:      actual,
 	}
-	quiz.Results = append(quiz.Results, quizResult)
-
 	if quizResult.Correct() {
 		kana.DecreaseWeight(quiz.PromptWeights, prompt)
 	} else {
 		kana.IncreaseWeight(quiz.PromptWeights, prompt)
 	}
-
 	quiz.PromptHistory = kana.ListAddFixedLength(quiz.PromptHistory, prompt, quiz.MaxRepeatHistory)
 	if err := q.Model.UpdateQuiz(r.Context(), quiz); err != nil {
+		return r.Views.InternalError(err)
+	}
+	if err := q.Model.AddQuizResult(r.Context(), quizResult); err != nil {
 		return r.Views.InternalError(err)
 	}
 	return web.RedirectWithMethodf(http.MethodGet, "/quiz/%s", quiz.ID.String())

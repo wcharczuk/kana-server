@@ -3,6 +3,7 @@ package local
 import (
 	"context"
 	"errors"
+	"sort"
 	"sync"
 
 	"github.com/blend/go-sdk/uuid"
@@ -21,6 +22,20 @@ var _ interfaces.Model = (*Model)(nil)
 type Model struct {
 	mu   sync.RWMutex
 	data map[string]*types.Quiz
+}
+
+// All retruns all quizzes in the datastore.
+func (m *Model) All(ctx context.Context) (output []types.Quiz, err error) {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+
+	for _, q := range m.data {
+		output = append(output, *q)
+	}
+	sort.Slice(output, func(i, j int) bool {
+		return output[i].CreatedUTC.Before(output[j].CreatedUTC)
+	})
+	return
 }
 
 // CreateQuiz creates a quiz.
@@ -55,6 +70,20 @@ func (m *Model) UpdateQuiz(_ context.Context, q types.Quiz) error {
 		return ErrNotFound
 	}
 	m.data[q.ID.String()] = &q
+	return nil
+}
+
+func (m *Model) AddQuizResult(_ context.Context, qr types.QuizResult) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	if m.data == nil {
+		return ErrNotFound
+	}
+	quiz, ok := m.data[qr.QuizID.String()]
+	if !ok {
+		return ErrNotFound
+	}
+	quiz.Results = append(quiz.Results, qr)
 	return nil
 }
 

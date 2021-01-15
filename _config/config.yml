@@ -1,0 +1,9 @@
+db:
+  database: "kana"
+
+logger:
+  flags: [ all ]
+  writable: [ all ]
+
+web:
+  bindAddr: ":8080"

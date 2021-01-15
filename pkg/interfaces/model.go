@@ -9,8 +9,9 @@ import (
 )
 
 type Model interface {
+	All(ctx context.Context) ([]types.Quiz, error)
 	CreateQuiz(context.Context, types.Quiz) error
 	GetQuiz(context.Context, uuid.UUID) (types.Quiz, error)
 	UpdateQuiz(context.Context, types.Quiz) error
-	Each(context.Context, func(types.Quiz) error) error
+	AddQuizResult(context.Context, types.QuizResult) error
 }
