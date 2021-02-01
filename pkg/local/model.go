@@ -25,12 +25,12 @@ type Model struct {
 }
 
 // All retruns all quizzes in the datastore.
-func (m *Model) All(ctx context.Context) (output []types.Quiz, err error) {
+func (m *Model) All(ctx context.Context) (output []*types.Quiz, err error) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 
 	for _, q := range m.data {
-		output = append(output, *q)
+		output = append(output, q)
 	}
 	sort.Slice(output, func(i, j int) bool {
 		return output[i].CreatedUTC.Before(output[j].CreatedUTC)

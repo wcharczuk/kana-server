@@ -35,15 +35,15 @@ func (m Model) Invoke(ctx context.Context) *db.Invocation {
 }
 
 // All returns all the quizzes.
-func (m Model) All(ctx context.Context) (output []types.Quiz, err error) {
+func (m Model) All(ctx context.Context) (output []*types.Quiz, err error) {
 	lookup := map[string]*types.Quiz{}
 	err = m.Invoke(ctx).Query(getQuizzesQuery).Each(func(r db.Rows) error {
 		var q types.Quiz
 		if populateErr := db.PopulateInOrder(&q, r, quizCols); populateErr != nil {
 			return populateErr
 		}
-		output = append(output, q)
-		lookup[q.ID.String()] = &output[len(output)-1] // we just added this with the append.
+		output = append(output, &q)
+		lookup[q.ID.String()] = &q
 		return nil
 	})
 	if err != nil {
@@ -56,6 +56,8 @@ func (m Model) All(ctx context.Context) (output []types.Quiz, err error) {
 		}
 		if quiz, ok := lookup[qr.QuizID.String()]; ok {
 			quiz.Results = append(quiz.Results, qr)
+		} else {
+			return fmt.Errorf("quiz for quiz result not found: %s", qr.QuizID.String())
 		}
 		return nil
 	})
