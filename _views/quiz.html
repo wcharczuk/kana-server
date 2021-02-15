@@ -25,7 +25,7 @@
                 <input type="hidden" name="prompt" value="{{ .ViewModel.Prompt }}" />
                 <input type="hidden" name="expected" value="{{ .ViewModel.Expected }}" />
                 <h1 class="quiz-prompt">{{ .ViewModel.Prompt }}</h1>
-                <input type="text" name="actual" class="bp3-input bp3-large bp3-fill" dir="auto" tabindex="0" autofocus/>
+                <input type="text" name="actual" class="bp3-input bp3-large bp3-fill" dir="auto" tabindex="0" autofocus required/>
                 <input type="submit" style="display: none" />
             </form>
         </div>
@@ -67,7 +67,7 @@
             <!-- quiz stats -->
             <div class="bp3-card">
                 {{ $stats := .ViewModel.Quiz.Stats }}
-                <h6 class="bp3-heading">Quiz Stats</h6>
+                <h6 class="bp3-heading">Overall Stats.</h6>
                 <div class="row">
                     <label class="bp3-text-muted six columns">Total</label>
                     <div class="align-right six columns">
@@ -91,17 +91,22 @@
             <!-- prompt stats -->
             <div class="bp3-card">
                 {{ $promptStats := .ViewModel.Quiz.PromptStats }}
-                <h6 class="bp3-heading">Quiz Kana Stats</h6>
+                <h6 class="bp3-heading">Kana Stats.</h6>
+                <div class="bp3-heading row">
+                    <label class="bp3-text-muted six columns text-underline">Kana</label>
+                    <div class="align-right six columns text-underline">Pct. Correct / Weight</div>
+
+                </div>
                 {{ range $index, $kana := $promptStats }}
                 <div class="row">
                     <label class="bp3-text-muted six columns">{{ $kana.Prompt }}</label>
                     <div class="align-right six columns">
-                        {{ $kana.PercentCorrect | mul 100 | printf "%.2f" }}%
+                        {{ $kana.PercentCorrect | mul 100 | printf "%.2f" }}% / {{ $kana.Weight }}
                     </div>
                 </div>
                 {{ else }}
                 <div class="row">
-                    <div class="bp3-text-muted twelve columns">No Answers Yet</div> 
+                    <div class="bp3-text-muted twelve columns align-center">No Answers Yet</div> 
                 </div>
                 {{ end }}
             </div>

@@ -9,27 +9,27 @@ import (
 func CreateWeights(values map[string]string) map[string]float64 {
 	output := make(map[string]float64)
 	for key := range values {
-		output[key] = weightDefault
+		output[key] = WeightDefault
 	}
 	return output
 }
 
 // IncreaseWeight increases the weight for a given value.
-func IncreaseWeight(weights map[string]float64, value string) {
-	if weight, ok := weights[value]; ok {
-		if weight < weightMax {
-			weights[value] = weight * weightIncreaseFactor
+func IncreaseWeight(weights map[string]float64, key string) {
+	if weight, ok := weights[key]; ok {
+		if weight < WeightMax {
+			weights[key] = weight * WeightIncreaseFactor
 		}
 	}
 }
 
 // DecreaseWeight decreases the weight for a given value.
-func DecreaseWeight(weights map[string]float64, value string) {
-	if weight, ok := weights[value]; ok {
-		if weight <= weightMin {
+func DecreaseWeight(weights map[string]float64, key string) {
+	if weight, ok := weights[key]; ok {
+		if weight <= WeightMin {
 			return
 		}
-		weights[value] = weight / weightDecreaseFactor
+		weights[key] = weight / WeightDecreaseFactor
 	}
 }
 

@@ -86,6 +86,7 @@ func (q Quiz) PromptStats() (output []*PromptStats) {
 		} else {
 			var newStats PromptStats
 			newStats.Prompt = res.Prompt
+			newStats.Weight = q.PromptWeights[res.Prompt]
 			newStats.Total = 1
 			if res.Correct() {
 				newStats.Correct = 1

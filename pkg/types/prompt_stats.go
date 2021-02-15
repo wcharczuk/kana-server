@@ -4,6 +4,7 @@ import "time"
 
 type PromptStats struct {
 	Prompt         string
+	Weight         float64
 	Total          int
 	Correct        int
 	ElapsedAverage time.Duration
@@ -12,8 +13,7 @@ type PromptStats struct {
 	ElapsedP75     time.Duration
 	ElapsedP90     time.Duration
 	ElapsedP95     time.Duration
-
-	ElapsedTimes []time.Duration
+	ElapsedTimes   []time.Duration
 }
 
 // PercentCorrect returns the percentage correct.

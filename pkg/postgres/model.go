@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/blend/go-sdk/db"
+	"github.com/blend/go-sdk/db/dbutil"
 	"github.com/blend/go-sdk/uuid"
 
 	"github.com/wcharczuk/kana-server/pkg/interfaces"
@@ -25,13 +26,7 @@ var (
 
 // Model
 type Model struct {
-	Conn     *db.Connection
-	Defaults []db.InvocationOption
-}
-
-// Invoke returns a new invocation.
-func (m Model) Invoke(ctx context.Context) *db.Invocation {
-	return m.Conn.Invoke(append(m.Defaults, db.OptContext(ctx))...)
+	dbutil.BaseManager
 }
 
 // All returns all the quizzes.

@@ -21,6 +21,10 @@
     color: #A82A2A;    
 }
 
+.text-underline {
+    text-decoration: underline;
+}
+
 .nav {
     padding-top: 10px;
     height: 75px;

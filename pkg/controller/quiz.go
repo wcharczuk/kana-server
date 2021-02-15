@@ -26,7 +26,7 @@ func (q Quiz) Register(app *web.App) {
 	)
 	app.GET("/quiz.new", q.getQuizNew)
 	app.POST("/quiz", q.postQuiz)
-	app.GET("/quiz/:id", q.getQuiz)
+	app.GET("/quiz/:id", q.getQuizPrompt)
 	app.POST("/quiz/:id/answer", q.postQuizAnswer)
 
 	app.GET("/stats", q.getStats)
@@ -90,7 +90,7 @@ func (q Quiz) postQuiz(r *web.Ctx) web.Result {
 }
 
 // GET /quiz/:id
-func (q Quiz) getQuiz(r *web.Ctx) web.Result {
+func (q Quiz) getQuizPrompt(r *web.Ctx) web.Result {
 	quizID, err := UUIDValue(r.Param("id"))
 	if err != nil {
 		return r.Views.BadRequest(err)
@@ -100,10 +100,22 @@ func (q Quiz) getQuiz(r *web.Ctx) web.Result {
 		return r.Views.InternalError(err)
 	}
 
-	prompt, expected := kana.SelectWeighted(quiz.Prompts, quiz.PromptWeights)
-	for kana.ListHas(quiz.PromptHistory, prompt) {
-		prompt, expected = kana.SelectWeighted(quiz.Prompts, quiz.PromptWeights)
+	// filter out the prompts (and weights)
+	// for which we have recent history
+	nonQueried := make(map[string]string)
+	for key, value := range quiz.Prompts {
+		nonQueried[key] = value
 	}
+	nonQueriedWeights := make(map[string]float64)
+	for key, value := range quiz.PromptWeights {
+		nonQueriedWeights[key] = value
+	}
+	for _, queried := range quiz.PromptHistory {
+		delete(nonQueried, queried)
+		delete(nonQueriedWeights, queried)
+	}
+
+	prompt, expected := kana.SelectWeighted(nonQueried, nonQueriedWeights)
 	return r.Views.View("quiz", types.QuizPrompt{
 		Quiz:       quiz,
 		CreatedUTC: time.Now().UTC(),
