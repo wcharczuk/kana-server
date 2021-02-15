@@ -1,3 +1,10 @@
+/*
+
+Copyright (c) 2021 - Present. Blend Labs, Inc. All rights reserved
+Use of this source code is governed by a MIT license that can be found in the LICENSE file.
+
+*/
+
 package configutil
 
 import (
@@ -28,7 +35,7 @@ func OptContext(ctx context.Context) Option {
 }
 
 // OptContents sets config contents on the options.
-func OptContents(contents []ConfigContents) Option {
+func OptContents(contents ...ConfigContents) Option {
 	return func(co *ConfigOptions) error {
 		co.Contents = contents
 		return nil

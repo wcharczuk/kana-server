@@ -1,3 +1,10 @@
+/*
+
+Copyright (c) 2021 - Present. Blend Labs, Inc. All rights reserved
+Use of this source code is governed by a MIT license that can be found in the LICENSE file.
+
+*/
+
 package dbutil
 
 import "github.com/blend/go-sdk/db"
@@ -11,7 +18,7 @@ func OpenManagementConnection(options ...db.Option) (*db.Connection, error) {
 		db.OptDatabase("postgres"),
 	}
 	conn, err := db.New(
-		append(defaults, append(options, db.OptDatabase("postgres"))...)...,
+		append(defaults, options...)...,
 	)
 	if err != nil {
 		return nil, err
