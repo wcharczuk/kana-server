@@ -1,81 +1,47 @@
 {{ define "stats" }} {{ template "header" . }}
 <div class="container stats">
     <h4 class="bp3-heading">Stats</h4>
-    <div class="row">
+    <table class="bp3-html-table bp3-html-table-condensed bp3-html-table-striped">
+        <thead>
+            <tr>
+                <!--01--><th>Created</th>
+                <!--02--><th>Include Hiragana</th>
+                <!--03--><th>Include Katakana</th>
+                <!--04--><th>Include Katakana Words</th>
+                <!--05--><th>Max Questions</th>
+                <!--06--><th>Max Prompts</th>
+                <!--07--><th>Max Repeat History</th>
+                <!--08--><th>Total</th>
+                <!--09--><th>Correct</th>
+                <!--10--><th>Pct. Correct</th>
+                <!--12--><th>P90 Elapsed</th>
+                <!--12--><th>Min/Max Elapsed</th>
+            </tr>
+        </thead>
+        <tbody>
     {{ range $index, $quiz := .ViewModel }}
-        <div class="bp3-card">
-            <h6 class="bp3-heading">Quiz</h6>
-            {{ if $quiz.Hiragana }}
-            <div class="row">
-                <label class="bp3-text-muted six columns">Includes Hiragana</label>
-            </div>
-            {{ end }}
-            {{ if $quiz.Katakana }}
-            <div class="row">
-                <label class="bp3-text-muted six columns">Includes Katakana</label>
-            </div>
-            {{ end }}
-            <div class="row">
-                <label class="bp3-text-muted six columns">Max Questions</label>
-                <div class="align-right">
-                    {{ $quiz.MaxQuestions }}
-                </div>
-            </div>
-            <div class="row">
-                <label class="bp3-text-muted six columns">Max Prompt Count</label>
-                <div class="align-right">
-                    {{ $quiz.MaxPrompts }}
-                </div>
-            </div>
-            <div class="row">
-                <label class="bp3-text-muted six columns">Max Repeat History</label>
-                <div class="align-right">
-                    {{ $quiz.MaxRepeatHistory }}
-                </div>
-            </div>
-
             {{ $stats := $quiz.Stats }}
-            <h6 class="bp3-heading">Quiz Stats</h6>
-            <div class="row">
-                <label class="bp3-text-muted six columns">Total</label>
-                <div class="align-right six columns">
-                    {{ $stats.Correct }} / {{ $stats.Total }}
-                </div>
-            </div>
-            <div class="row">
-                <label class="bp3-text-muted six columns">Average</label>
-                <div class="align-right six columns">
-                    {{ $stats.ElapsedAverage | duration_round_millis }} 
-                </div>
-            </div>
-            <div class="row">
-                <label class="bp3-text-muted six columns">90th Percentile</label>
-                <div class="align-right six columns">
-                    {{ $stats.ElapsedP90 | duration_round_millis }}
-                </div>
-            </div>
-
-            {{ $promptStats := $quiz.PromptStats }}
-            <h6 class="bp3-heading">Quiz Kana Stats</h6>
-            {{ range $kanaIndex, $kana := $promptStats }}
-            <div class="row">
-                <label class="bp3-text-muted six columns">{{ $kana.Prompt }}</label>
-                <div class="align-right six columns">
-                    {{ $kana.PercentCorrect | mul 100 | printf "%.2f" }}%
-                </div>
-            </div>
-            {{ else }}
-            <div class="row">
-                <div class="bp3-text-muted twelve columns">No Answers Yet</div> 
-            </div>
-            {{ end }}
-        </div>
+        <tr>
+            <td>{{ $quiz.CreatedUTC | time_format "Jan _2 15:04:05" }}</td>
+            <td>{{ $quiz.Hiragana }}</td>
+            <td>{{ $quiz.Katakana }}</td>
+            <td>{{ $quiz.KatakanaWords }}</td>
+            <td>{{ $quiz.MaxQuestions}}</td>
+            <td>{{ $quiz.MaxPrompts }}</td>
+            <td>{{ $quiz.MaxRepeatHistory }}</td>
+            <td>{{ $stats.Total }}</td>
+            <td>{{ $stats.Correct }}</td>
+            <td>{{ $stats.PercentCorrect | printf "%.2f" }}%</td>
+            <td>{{ $stats.ElapsedP90 | duration_round_millis }}</td>
+            <td>{{ $stats.ElapsedMin | duration_round_millis }} / {{ $stats.ElapsedMax | duration_round_millis }}</td>
+        </tr>
     {{ else }}
-        <div class="bp3-card">
-            <h2>No quizzes</h2>
-        </div>
+        <tr>
+            <td colspan="12">No Quiz Results</td>
+        </tr>
     {{ end }}
-    </div>
+        </tbody>
+    </table>
 </div>
 {{ template "footer" . }}
 {{ end }}

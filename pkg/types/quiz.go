@@ -22,10 +22,10 @@ type Quiz struct {
 	Katakana bool `db:"katakana"`
 	// KatakanaWords indicates if we should include prompts from the katakana words set.
 	KatakanaWords bool `db:"katakana_words"`
-	// MaxPrompts is the maximum number of prompts to pull from either prompt set (or in total)
-	MaxPrompts int `db:"max_prompts"`
 	// MaxQuestions is the maximum number of questions to ask per quiz.
 	MaxQuestions int `db:"max_questions"`
+	// MaxPrompts is the maximum number of prompts to pull from either prompt set (or in total)
+	MaxPrompts int `db:"max_prompts"`
 	// MaxRepeatHistory is the debounce history list length.
 	MaxRepeatHistory int `db:"max_repeat_history"`
 	// Results are the individual prompts and answers.
@@ -66,10 +66,11 @@ func (q Quiz) Stats() (stats QuizStats) {
 		stats.Total++
 	}
 
-	stats.ElapsedAverage = mathutil.MeanDurations(elapsedTimes)
-	stats.ElapsedP90 = mathutil.PercentileOfDuration(elapsedTimes, 0.90)
-	stats.ElapsedP95 = mathutil.PercentileOfDuration(elapsedTimes, 0.95)
-	stats.ElapsedMin, stats.ElapsedMax = mathutil.MinMaxDurations(elapsedTimes)
+	sortedElapsedTimes := mathutil.CopySortDurations(elapsedTimes)
+	stats.ElapsedAverage = mathutil.MeanDurations(sortedElapsedTimes)
+	stats.ElapsedP90 = mathutil.PercentileSortedDurations(sortedElapsedTimes, 90.0)
+	stats.ElapsedP95 = mathutil.PercentileSortedDurations(sortedElapsedTimes, 95.0)
+	stats.ElapsedMin, stats.ElapsedMax = mathutil.MinMaxDurations(sortedElapsedTimes)
 	return
 }
 
@@ -101,8 +102,8 @@ func (q Quiz) PromptStats() (output []*PromptStats) {
 
 	for _, stats := range output {
 		stats.ElapsedAverage = mathutil.MeanDurations(stats.ElapsedTimes)
-		stats.ElapsedP90 = mathutil.PercentileOfDuration(stats.ElapsedTimes, 0.90)
-		stats.ElapsedP95 = mathutil.PercentileOfDuration(stats.ElapsedTimes, 0.95)
+		stats.ElapsedP90 = mathutil.PercentileOfDuration(stats.ElapsedTimes, 90.0)
+		stats.ElapsedP95 = mathutil.PercentileOfDuration(stats.ElapsedTimes, 95.0)
 		stats.ElapsedMin, stats.ElapsedMax = mathutil.MinMaxDurations(stats.ElapsedTimes)
 	}
 	sort.Slice(output, func(i, j int) bool {
