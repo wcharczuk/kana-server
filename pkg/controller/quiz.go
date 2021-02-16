@@ -32,9 +32,9 @@ func (q Quiz) Register(app *web.App) {
 	app.GET("/stats", q.getStats)
 }
 
-// GET /quiz.new
+// GET /stats
 func (q Quiz) getStats(r *web.Ctx) web.Result {
-	all, err := q.Model.All(r.Context())
+	all, err := q.Model.AllQuzzes(r.Context())
 	if err != nil {
 		return r.Views.InternalError(err)
 	}
@@ -95,9 +95,12 @@ func (q Quiz) getQuizPrompt(r *web.Ctx) web.Result {
 	if err != nil {
 		return r.Views.BadRequest(err)
 	}
-	quiz, err := q.Model.GetQuiz(r.Context(), quizID)
+	quiz, found, err := q.Model.GetQuiz(r.Context(), quizID)
 	if err != nil {
 		return r.Views.InternalError(err)
+	}
+	if !found {
+		return r.Views.NotFound()
 	}
 
 	// filter out the prompts (and weights)
@@ -130,9 +133,12 @@ func (q Quiz) postQuizAnswer(r *web.Ctx) web.Result {
 	if err != nil {
 		return r.Views.BadRequest(err)
 	}
-	quiz, err := q.Model.GetQuiz(r.Context(), quizID)
+	quiz, found, err := q.Model.GetQuiz(r.Context(), quizID)
 	if err != nil {
 		return r.Views.InternalError(err)
+	}
+	if !found {
+		return r.Views.NotFound()
 	}
 	createdUTC, err := web.Int64Value(r.Param("createdUTC"))
 	if err != nil {

@@ -62,6 +62,7 @@ func NewTestQuizResultIncorrect(quiz *Quiz) *QuizResult {
 	answerElapsed := time.Duration(rand.Int63n(int64(5 * time.Second)))
 	return &QuizResult{
 		ID:          uuid.V4(),
+		QuizID:      quiz.ID,
 		CreatedUTC:  now.Add(-answerElapsed),
 		AnsweredUTC: now,
 		Prompt:      prompt,

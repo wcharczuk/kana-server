@@ -26,13 +26,20 @@ var (
 	getQuizResultsQuery        = fmt.Sprintf("SELECT %s FROM %s WHERE quiz_id = $1", quizResultCols.ColumnNamesCSV(), quizResultTableName)
 )
 
+// New returns a new model manager.
+func New(conn *db.Connection, opts ...db.InvocationOption) *Model {
+	return &Model{
+		BaseManager: dbutil.NewBaseManager(conn, opts...),
+	}
+}
+
 // Model implements database functions.
 type Model struct {
 	dbutil.BaseManager
 }
 
-// All returns all the quizzes.
-func (m Model) All(ctx context.Context) (output []*types.Quiz, err error) {
+// AllQuzzes returns all the quizzes.
+func (m Model) AllQuzzes(ctx context.Context) (output []*types.Quiz, err error) {
 	lookup := map[string]*types.Quiz{}
 	err = m.Invoke(ctx).Query(getQuizzesQuery).Each(func(r db.Rows) error {
 		var q types.Quiz
@@ -67,8 +74,7 @@ func (m Model) CreateQuiz(ctx context.Context, q types.Quiz) error {
 }
 
 // GetQuiz gets a quiz and associated results.
-func (m Model) GetQuiz(ctx context.Context, id uuid.UUID) (output types.Quiz, err error) {
-	var found bool
+func (m Model) GetQuiz(ctx context.Context, id uuid.UUID) (output types.Quiz, found bool, err error) {
 	found, err = m.Invoke(ctx).Get(&output, id)
 	if err != nil || !found {
 		return
