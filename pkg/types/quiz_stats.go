@@ -19,5 +19,5 @@ func (qs QuizStats) PercentCorrect() float64 {
 	if qs.Total == 0 {
 		return 0.0
 	}
-	return float64(qs.Correct) / float64(qs.Total)
+	return (float64(qs.Correct) / float64(qs.Total)) * 100
 }
