@@ -34,6 +34,10 @@ func DecreaseWeight(weights map[string]float64, key string) {
 }
 
 // SelectCount returns the first N elements from a given combined values set.
+//
+// The selection is mostly random, and predicated on map ordering being random.
+// If this ever changes (map ordering being random) we will need to use
+// random bag pulls.
 func SelectCount(values map[string]string, count int) map[string]string {
 	if count == 0 || len(values) <= count {
 		return values

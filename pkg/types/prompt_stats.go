@@ -2,6 +2,7 @@ package types
 
 import "time"
 
+// PromptStats hold statistics for a prompt.
 type PromptStats struct {
 	Prompt         string
 	Weight         float64

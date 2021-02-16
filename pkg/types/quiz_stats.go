@@ -2,6 +2,7 @@ package types
 
 import "time"
 
+// QuizStats hold statistics for a quiz.
 type QuizStats struct {
 	Total          int
 	Correct        int

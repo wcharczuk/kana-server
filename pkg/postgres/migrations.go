@@ -2,6 +2,7 @@ package postgres
 
 import "github.com/blend/go-sdk/db/migration"
 
+// Migrations returns the migration suite to bootstrap the database.
 func Migrations() *migration.Suite {
 	return migration.New(
 		migration.OptGroups(

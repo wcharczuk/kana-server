@@ -18,13 +18,15 @@ var (
 
 var (
 	quizCols                   = db.Columns(types.Quiz{})
-	getQuizzesQuery            = fmt.Sprintf("SELECT %s FROM %s ORDER BY created_utc desc", quizCols.ColumnNamesCSV(), types.Quiz{}.TableName())
-	getQuizzesQuizResultsQuery = fmt.Sprintf("SELECT %s FROM %s", quizResultCols.ColumnNamesCSV(), types.QuizResult{}.TableName())
+	quizTableName              = types.Quiz{}.TableName()
+	getQuizzesQuery            = fmt.Sprintf("SELECT %s FROM %s ORDER BY created_utc desc", quizCols.ColumnNamesCSV(), quizTableName)
+	getQuizzesQuizResultsQuery = fmt.Sprintf("SELECT %s FROM %s", quizResultCols.ColumnNamesCSV(), quizResultTableName)
 	quizResultCols             = db.Columns(types.QuizResult{})
-	getQuizResultsQuery        = fmt.Sprintf("SELECT %s FROM %s WHERE quiz_id = $1", quizResultCols.ColumnNamesCSV(), types.QuizResult{}.TableName())
+	quizResultTableName        = types.QuizResult{}.TableName()
+	getQuizResultsQuery        = fmt.Sprintf("SELECT %s FROM %s WHERE quiz_id = $1", quizResultCols.ColumnNamesCSV(), quizResultTableName)
 )
 
-// Model
+// Model implements database functions.
 type Model struct {
 	dbutil.BaseManager
 }

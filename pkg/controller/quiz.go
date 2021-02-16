@@ -91,7 +91,7 @@ func (q Quiz) postQuiz(r *web.Ctx) web.Result {
 
 // GET /quiz/:id
 func (q Quiz) getQuizPrompt(r *web.Ctx) web.Result {
-	quizID, err := UUIDValue(r.Param("id"))
+	quizID, err := web.UUIDValue(r.Param("id"))
 	if err != nil {
 		return r.Views.BadRequest(err)
 	}
@@ -126,7 +126,7 @@ func (q Quiz) getQuizPrompt(r *web.Ctx) web.Result {
 
 // POST /quiz/:id/answer
 func (q Quiz) postQuizAnswer(r *web.Ctx) web.Result {
-	quizID, err := UUIDValue(r.Param("id"))
+	quizID, err := web.UUIDValue(r.Param("id"))
 	if err != nil {
 		return r.Views.BadRequest(err)
 	}

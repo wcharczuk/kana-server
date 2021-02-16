@@ -1,13 +1,16 @@
 package types
 
 import (
+	"math/rand"
 	"strings"
 	"time"
 
 	"github.com/blend/go-sdk/uuid"
+
+	"github.com/wcharczuk/kana-server/pkg/kana"
 )
 
-// Quiz is a quiz result.
+// QuizResult is a quiz result.
 type QuizResult struct {
 	ID          uuid.UUID `db:"id,pk"`
 	QuizID      uuid.UUID `db:"quiz_id"`
@@ -34,4 +37,35 @@ func (qr QuizResult) Correct() bool {
 		strings.TrimSpace(qr.Expected),
 		strings.TrimSpace(qr.Actual),
 	)
+}
+
+// NewTestQuizResultCorrect returns a new correct quiz result.
+func NewTestQuizResultCorrect(quiz *Quiz) *QuizResult {
+	prompt, expected := kana.SelectWeighted(quiz.Prompts, quiz.PromptWeights)
+	now := time.Now().UTC()
+	answerElapsed := time.Duration(rand.Int63n(int64(5 * time.Second)))
+	return &QuizResult{
+		ID:          uuid.V4(),
+		QuizID:      quiz.ID,
+		CreatedUTC:  now.Add(-answerElapsed),
+		AnsweredUTC: now,
+		Prompt:      prompt,
+		Expected:    expected,
+		Actual:      expected,
+	}
+}
+
+// NewTestQuizResultIncorrect returns a new correct quiz result.
+func NewTestQuizResultIncorrect(quiz *Quiz) *QuizResult {
+	prompt, expected := kana.SelectWeighted(quiz.Prompts, quiz.PromptWeights)
+	now := time.Now().UTC()
+	answerElapsed := time.Duration(rand.Int63n(int64(5 * time.Second)))
+	return &QuizResult{
+		ID:          uuid.V4(),
+		CreatedUTC:  now.Add(-answerElapsed),
+		AnsweredUTC: now,
+		Prompt:      prompt,
+		Expected:    expected,
+		Actual:      "not-" + expected,
+	}
 }

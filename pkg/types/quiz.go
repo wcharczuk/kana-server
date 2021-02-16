@@ -6,6 +6,8 @@ import (
 
 	"github.com/blend/go-sdk/mathutil"
 	"github.com/blend/go-sdk/uuid"
+
+	"github.com/wcharczuk/kana-server/pkg/kana"
 )
 
 // Quiz is a quiz.
@@ -37,11 +39,11 @@ type Quiz struct {
 }
 
 // TableName returns the database tablename for the type.
-func (qr Quiz) TableName() string { return "quiz" }
+func (q Quiz) TableName() string { return "quiz" }
 
 // IsZero returns if the quiz is set or not.
-func (qr Quiz) IsZero() bool {
-	return qr.ID == nil || qr.ID.IsZero()
+func (q Quiz) IsZero() bool {
+	return q.ID == nil || q.ID.IsZero()
 }
 
 // LatestResult returns the latest result.
@@ -52,7 +54,7 @@ func (q Quiz) LatestResult() *QuizResult {
 	return nil
 }
 
-// ElapsedTimes returns the elapsed time aggregates.
+// Stats returns the stats for the quiz.
 func (q Quiz) Stats() (stats QuizStats) {
 	var elapsedTimes []time.Duration
 
@@ -107,4 +109,21 @@ func (q Quiz) PromptStats() (output []*PromptStats) {
 		return output[i].Prompt < output[j].Prompt
 	})
 	return
+}
+
+// NewTestQuiz returns a new test quiz.
+func NewTestQuiz() *Quiz {
+	prompts := kana.SelectCount(kana.Merge(kana.Hiragana, kana.Katakana), 10)
+	return &Quiz{
+		ID:               uuid.V4(),
+		CreatedUTC:       time.Now().UTC(),
+		Hiragana:         true,
+		Katakana:         true,
+		KatakanaWords:    false,
+		MaxPrompts:       10,
+		MaxQuestions:     0,
+		MaxRepeatHistory: 5,
+		Prompts:          prompts,
+		PromptWeights:    kana.CreateWeights(prompts),
+	}
 }
