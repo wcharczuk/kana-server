@@ -23,6 +23,7 @@ func (q Quiz) Register(app *web.App) {
 		"_views/quiz.html",
 		"_views/new_quiz.html",
 		"_views/stats.html",
+		"_views/stats_quiz.html",
 	)
 	app.GET("/quiz.new", q.getQuizNew)
 	app.POST("/quiz", q.postQuiz)
@@ -30,6 +31,7 @@ func (q Quiz) Register(app *web.App) {
 	app.POST("/quiz/:id/answer", q.postQuizAnswer)
 
 	app.GET("/stats", q.getStats)
+	app.GET("/stats/:id", q.getQuizStats)
 }
 
 // GET /stats
@@ -39,6 +41,22 @@ func (q Quiz) getStats(r *web.Ctx) web.Result {
 		return r.Views.InternalError(err)
 	}
 	return r.Views.View("stats", all)
+}
+
+// GET /stats/:id
+func (q Quiz) getQuizStats(r *web.Ctx) web.Result {
+	quizID, err := web.UUIDValue(r.RouteParam("id"))
+	if err != nil {
+		return r.Views.BadRequest(err)
+	}
+	quiz, found, err := q.Model.GetQuiz(r.Context(), quizID)
+	if err != nil {
+		return r.Views.InternalError(err)
+	}
+	if !found {
+		return r.Views.NotFound()
+	}
+	return r.Views.View("stats_quiz", quiz)
 }
 
 // GET /quiz.new
@@ -178,5 +196,12 @@ func (q Quiz) postQuizAnswer(r *web.Ctx) web.Result {
 	if err := q.Model.AddQuizResult(r.Context(), quizResult); err != nil {
 		return r.Views.InternalError(err)
 	}
+
+	if quiz.MaxQuestions > 0 {
+		if len(quiz.Results)+1 >= quiz.MaxQuestions {
+			return web.RedirectWithMethodf(http.MethodGet, "/stats/%s", quiz.ID.String())
+		}
+	}
+
 	return web.RedirectWithMethodf(http.MethodGet, "/quiz/%s", quiz.ID.String())
 }

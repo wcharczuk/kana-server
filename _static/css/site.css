@@ -53,6 +53,10 @@
     padding-top: 15px;
 }
 
-.stats h6:not(:first) {
-    margin-top: 10px;
+.container.stats > .row {
+    margin-top: 20px;
+}
+
+.container.stats thead, .container.stats tbody {
+    font-size: 1.0rem;
 }

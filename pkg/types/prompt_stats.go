@@ -22,5 +22,5 @@ func (ps PromptStats) PercentCorrect() float64 {
 	if ps.Total == 0 {
 		return 0.0
 	}
-	return float64(ps.Correct) / float64(ps.Total)
+	return (float64(ps.Correct) / float64(ps.Total)) * 100.0
 }

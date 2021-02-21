@@ -1,0 +1,83 @@
+{{ define "stats_quiz" }} {{ template "header" . }}
+{{ $dateFormat := "2006-01-02 15:04Z"}}
+{{ $stats := .ViewModel.Stats }}
+{{ $promptStats := .ViewModel.PromptStats }}
+<div class="container stats">
+    <ul class="bp3-breadcrumbs">
+        <li><a class="bp3-breadcrumb" href="/stats">Stats</a></li>
+        <li><span class="bp3-breadcrumb bp3-breadcrumb-current">{{ .ViewModel.ID }}</span></li>
+    </ul>
+    <div class="row">
+        <div class="twelve columns">
+            <table class="bp3-html-table bp3-html-table-condensed bp3-html-table-striped u-full-width u-max-full-width">
+                <thead>
+                    <tr>
+                        <th>Created</th>
+                        <th>Hiragana</th>
+                        <th>Katakana</th>
+                        <th>Katakana Words</th>
+                        <th>Questions</th>
+                        <th>Prompts</th>
+                        <th>History</th>
+                        <th>Total</th>
+                        <th>Correct</th>
+                        <th>Pct. Correct</th>
+                        <th>P90 Elapsed</th>
+                        <th>Min/Max Elapsed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ .ViewModel.CreatedUTC | time_format $dateFormat }}</td>
+                        <td>{{ .ViewModel.Hiragana }}</td>
+                        <td>{{ .ViewModel.Katakana }}</td>
+                        <td>{{ .ViewModel.KatakanaWords }}</td>
+                        <td>{{ .ViewModel.MaxQuestions}}</td>
+                        <td>{{ .ViewModel.MaxPrompts }}</td>
+                        <td>{{ .ViewModel.MaxRepeatHistory }}</td>
+                        <td>{{ $stats.Total }}</td>
+                        <td>{{ $stats.Correct }}</td>
+                        <td>{{ $stats.PercentCorrect | printf "%.2f" }}%</td>
+                        <td>{{ $stats.ElapsedP90 | duration_round_millis }}</td>
+                        <td>{{ $stats.ElapsedMin | duration_round_millis }} / {{ $stats.ElapsedMax | duration_round_millis }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="twelve columns">
+            <table class="bp3-html-table bp3-html-table-condensed bp3-html-table-striped u-full-width u-max-full-width">
+                <thead>
+                    <tr>
+                        <th>Prompt</th>
+                        <th>Pct. Correct</th>
+                        <th>Weight</th>
+                        <th>Total</th>
+                        <th>Correct</th>
+                        <th>Elapsed Min.</th>
+                        <th>Elapsed Avg.</th>
+                        <th>Elapsed P90</th>
+                        <th>Elapsed Max</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{ range $prompt := $promptStats }}
+                    <tr>
+                        <td>{{ $prompt.Prompt }}</td>
+                        <td>{{ $prompt.PercentCorrect | printf "%.2f" }}%</td>
+                        <td>{{ $prompt.Weight | printf "%.2f" }}</td>
+                        <td>{{ $prompt.Total }}</td>
+                        <td>{{ $prompt.Correct }}</td>
+                        <td>{{ $prompt.ElapsedMin | duration_round_millis }}</td>
+                        <td>{{ $prompt.ElapsedAverage | duration_round_millis }}</td>
+                        <td>{{ $prompt.ElapsedP90 | duration_round_millis }}</td>
+                        <td>{{ $prompt.ElapsedMax | duration_round_millis }}</td>
+                    </tr>
+                    {{ end }}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{{ template "footer" }}{{ end }}
