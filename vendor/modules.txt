@@ -1,4 +1,4 @@
-# github.com/blend/go-sdk v1.20210216.3
+# github.com/blend/go-sdk v1.20210220.2
 ## explicit
 github.com/blend/go-sdk/ansi
 github.com/blend/go-sdk/assert
