@@ -2,4 +2,4 @@ module github.com/wcharczuk/kana-server
 
 go 1.16
 
-require github.com/blend/go-sdk v1.20210221.5
+require github.com/blend/go-sdk v1.20210227.3
