@@ -7,6 +7,15 @@ import (
 	"github.com/blend/go-sdk/uuid"
 )
 
+// ApplyProfileToUser applies an oauth proflie.
+func ApplyProfileToUser(u *User, p oauth.Profile) {
+	u.Email = p.Email
+	u.GivenName = p.GivenName
+	u.FamilyName = p.FamilyName
+	u.Locale = p.Locale
+	u.PictureURL = p.PictureURL
+}
+
 // User is a user
 type User struct {
 	ID          uuid.UUID `db:"id,pk"`
@@ -23,12 +32,3 @@ type User struct {
 
 // TableName returns the mapped table name.
 func (u User) TableName() string { return "users" }
-
-// FromOAuth sets the user from a given oauth profile.
-func (u *User) FromOAuth(p oauth.Profile) {
-	u.Email = p.Email
-	u.GivenName = p.GivenName
-	u.FamilyName = p.FamilyName
-	u.Locale = p.Locale
-	u.PictureURL = p.PictureURL
-}

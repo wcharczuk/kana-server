@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"context"
 	"net/http"
 	"net/url"
 	"time"
@@ -11,6 +12,12 @@ import (
 
 	"github.com/wcharczuk/kana-server/pkg/config"
 	"github.com/wcharczuk/kana-server/pkg/model"
+	"github.com/wcharczuk/kana-server/pkg/types"
+)
+
+const (
+	// SessionKeyUser is the session state key where the user reference is held.
+	SessionKeyUser = "__user__"
 )
 
 type Auth struct {
@@ -22,7 +29,10 @@ type Auth struct {
 func (a Auth) Register(app *web.App) {
 	jwtm := web.NewJWTManager(a.mustSecret())
 	jwtm.Apply(&app.Auth)
+
+	app.Auth.FetchHandler = a.fetchHandler(jwtm.FetchHandler)
 	app.Auth.LoginRedirectHandler = a.loginRedirect
+
 	app.GET("/login", a.login, web.SessionAware, web.ViewProviderAsDefault)
 	app.GET("/logout", a.logout, web.SessionAware, web.ViewProviderAsDefault)
 	app.GET("/oauth/google", a.oauthGoogle, web.SessionAware, web.ViewProviderAsDefault)
@@ -54,7 +64,7 @@ func (a Auth) oauthGoogle(r *web.Ctx) web.Result {
 	if err != nil {
 		return r.Views.InternalError(err)
 	}
-	(&user).FromOAuth(result.Profile)
+	types.ApplyProfileToUser(&user, result.Profile)
 	if !found {
 		user.ID = uuid.V4()
 		user.CreatedUTC = time.Now().UTC()
@@ -99,6 +109,25 @@ func (a Auth) mustSecret() []byte {
 
 func (a Auth) authedRedirect() web.Result {
 	return web.RedirectWithMethod(http.MethodGet, "/checks")
+}
+
+func (a Auth) fetchHandler(jwtHandler web.AuthManagerFetchSessionHandler) web.AuthManagerFetchSessionHandler {
+	return func(ctx context.Context, sessionValue string) (*web.Session, error) {
+		session, err := jwtHandler(ctx, sessionValue)
+		if err != nil {
+			return nil, err
+		}
+		var user types.User
+		found, err := a.Model.Invoke(ctx).Get(&user, session.UserID)
+		if err != nil {
+			return nil, err
+		}
+		if !found {
+			return nil, nil
+		}
+		session.State[SessionKeyUser] = &user
+		return session, nil
+	}
 }
 
 func (a Auth) loginRedirect(r *web.Ctx) *url.URL {

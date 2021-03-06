@@ -19,9 +19,11 @@
         <div class="four columns">
             <h1 class="nav-hero"><a href="/">Kana Quiz</a></h1>
         </div>
+        {{ if .Ctx.Session }}
         <div class="eight columns align-right">
             <a href="/stats" class="bp3-button">Stats</a>
             <a href="/quiz.new" class="bp3-button bp3-intent-success">Start new quiz</a>
         </div>
+        {{ end }}
     </nav>
 {{end}}
