@@ -100,7 +100,7 @@
                 <div class="row">
                     <label class="bp3-text-muted six columns">{{ $kana.Prompt }}</label>
                     <div class="align-right six columns">
-                        {{ $kana.PercentCorrect | mul 100 | printf "%.2f" }}% / {{ $kana.Weight }}
+                        {{ $kana.PercentCorrect | printf "%.2f" }}% / {{ $kana.Weight }}
                     </div>
                 </div>
                 {{ else }}

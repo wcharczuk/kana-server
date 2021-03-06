@@ -22,7 +22,7 @@ type QuizResult struct {
 }
 
 // TableName returns the database tablename for the type.
-func (qr QuizResult) TableName() string { return "quiz_result " }
+func (qr QuizResult) TableName() string { return "quiz_result" }
 
 // Elapsed returns the elapsed time as a duration from the answered to the created times.
 func (qr QuizResult) Elapsed() time.Duration {

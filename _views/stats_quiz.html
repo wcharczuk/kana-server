@@ -13,9 +13,7 @@
                 <thead>
                     <tr>
                         <th>Created</th>
-                        <th>Hiragana</th>
-                        <th>Katakana</th>
-                        <th>Katakana Words</th>
+                        <th>Prompts</th>
                         <th>Questions</th>
                         <th>Prompts</th>
                         <th>History</th>
@@ -29,9 +27,7 @@
                 <tbody>
                     <tr>
                         <td>{{ .ViewModel.CreatedUTC | time_format $dateFormat }}</td>
-                        <td>{{ .ViewModel.Hiragana }}</td>
-                        <td>{{ .ViewModel.Katakana }}</td>
-                        <td>{{ .ViewModel.KatakanaWords }}</td>
+                        <td>{{ template "quiz_settings" .ViewModel }}</td>
                         <td>{{ .ViewModel.MaxQuestions}}</td>
                         <td>{{ .ViewModel.MaxPrompts }}</td>
                         <td>{{ .ViewModel.MaxRepeatHistory }}</td>
