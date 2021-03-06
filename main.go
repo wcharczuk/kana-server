@@ -10,7 +10,7 @@ import (
 
 	"github.com/wcharczuk/kana-server/pkg/config"
 	"github.com/wcharczuk/kana-server/pkg/controller"
-	"github.com/wcharczuk/kana-server/pkg/postgres"
+	"github.com/wcharczuk/kana-server/pkg/model"
 )
 
 func main() {
@@ -39,7 +39,7 @@ func main() {
 		web.OptConfig(cfg.Web),
 		web.OptLog(log),
 	)
-	model := postgres.Model{
+	model := model.Manager{
 		BaseManager: dbutil.NewBaseManager(conn),
 	}
 	server.Register(

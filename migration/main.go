@@ -10,7 +10,7 @@ import (
 	"github.com/blend/go-sdk/logger"
 
 	"github.com/wcharczuk/kana-server/pkg/config"
-	"github.com/wcharczuk/kana-server/pkg/postgres"
+	"github.com/wcharczuk/kana-server/pkg/model"
 )
 
 func main() {
@@ -39,7 +39,7 @@ func main() {
 		logger.MaybeFatalExit(log, err)
 	}
 
-	suite := postgres.Migrations()
+	suite := model.Migrations()
 	suite.Log = log
 	if err := suite.Apply(context.Background(), conn); err != nil {
 		logger.MaybeFatalExit(log, err)
