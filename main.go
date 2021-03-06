@@ -6,6 +6,7 @@ import (
 	"github.com/blend/go-sdk/db/dbutil"
 	"github.com/blend/go-sdk/graceful"
 	"github.com/blend/go-sdk/logger"
+	"github.com/blend/go-sdk/oauth"
 	"github.com/blend/go-sdk/web"
 
 	"github.com/wcharczuk/kana-server/pkg/config"
@@ -35,16 +36,24 @@ func main() {
 	}
 	log.Infof("using database dsn: %s", cfg.DB.CreateLoggingDSN())
 
+	oauthMgr, err := oauth.New(
+		oauth.OptConfig(cfg.OAuth),
+	)
+	if err != nil {
+		logger.MaybeFatalExit(log, err)
+	}
+
 	server := web.MustNew(
 		web.OptConfig(cfg.Web),
 		web.OptLog(log),
 	)
-	model := model.Manager{
+	modelMgr := model.Manager{
 		BaseManager: dbutil.NewBaseManager(conn),
 	}
 	server.Register(
 		controller.Index{Config: cfg},
-		controller.Quiz{Model: model},
+		controller.Auth{Config: cfg, Model: modelMgr, OAuth: oauthMgr},
+		controller.Quiz{Model: modelMgr},
 	)
 	// disable later
 	server.Views.LiveReload = true

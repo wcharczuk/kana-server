@@ -6,6 +6,7 @@ import "github.com/blend/go-sdk/db/migration"
 func Migrations() *migration.Suite {
 	return migration.New(
 		migration.OptGroups(
+			users(),
 			quizzes(),
 			quizResults(),
 		),
@@ -18,15 +19,17 @@ func users() *migration.Group {
 		migration.Statements(
 			`CREATE TABLE users (
 				id uuid not null primary key,
-				created_utc timestampz not null,
-				last_seen_utc timestampz not null,
+				created_utc timestamp not null,
+				last_login_utc timestamp not null,
+				last_seen_utc timestamp not null,
 				profile_id text not null,
 				given_name text not null,
 				family_name text not null,
 				picture_url text not null,
 				locale text not null,
-				email text not null,
+				email text not null
 			)`,
+			`ALTER TABLE users ADD CONSTRAINT uk_users_email UNIQUE (email)`,
 		),
 	)
 }
@@ -37,7 +40,8 @@ func quizzes() *migration.Group {
 		migration.Statements(
 			`CREATE TABLE quiz (
 				id uuid not null primary key,
-				created_utc timestampz not null,
+				created_utc timestamp not null,
+				last_answered_utc timestamp not null,
 				user_id uuid not null,
 				hiragana boolean not null default false,	
 				katakana boolean not null default false,	
@@ -62,8 +66,8 @@ func quizResults() *migration.Group {
 				id uuid not null primary key,
 				user_id uuid not null,
 				quiz_id uuid not null,
-				created_utc timestampz not null,
-				answered_utc timestampz not null,
+				created_utc timestamp not null,
+				answered_utc timestamp not null,
 				prompt text not null,
 				expected text not null,
 				actual text not null

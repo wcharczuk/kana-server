@@ -14,6 +14,7 @@ import (
 type QuizResult struct {
 	ID          uuid.UUID `db:"id,pk"`
 	QuizID      uuid.UUID `db:"quiz_id"`
+	UserID      uuid.UUID `db:"user_id"`
 	CreatedUTC  time.Time `db:"created_utc"`
 	AnsweredUTC time.Time `db:"answered_utc"`
 	Prompt      string    `db:"prompt"`
@@ -46,6 +47,7 @@ func NewTestQuizResultCorrect(quiz *Quiz) *QuizResult {
 	answerElapsed := time.Duration(rand.Int63n(int64(5 * time.Second)))
 	return &QuizResult{
 		ID:          uuid.V4(),
+		UserID:      quiz.UserID,
 		QuizID:      quiz.ID,
 		CreatedUTC:  now.Add(-answerElapsed),
 		AnsweredUTC: now,
@@ -62,6 +64,7 @@ func NewTestQuizResultIncorrect(quiz *Quiz) *QuizResult {
 	answerElapsed := time.Duration(rand.Int63n(int64(5 * time.Second)))
 	return &QuizResult{
 		ID:          uuid.V4(),
+		UserID:      quiz.UserID,
 		QuizID:      quiz.ID,
 		CreatedUTC:  now.Add(-answerElapsed),
 		AnsweredUTC: now,

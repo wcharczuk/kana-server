@@ -20,12 +20,14 @@ const (
 	SessionKeyUser = "__user__"
 )
 
+// Auth is the auth controller.
 type Auth struct {
 	Config config.Config
 	OAuth  *oauth.Manager
-	Model  *model.Manager
+	Model  model.Manager
 }
 
+// Register adds the controller routes to the application.
 func (a Auth) Register(app *web.App) {
 	jwtm := web.NewJWTManager(a.mustSecret())
 	jwtm.Apply(&app.Auth)
@@ -69,6 +71,7 @@ func (a Auth) oauthGoogle(r *web.Ctx) web.Result {
 		user.ID = uuid.V4()
 		user.CreatedUTC = time.Now().UTC()
 	}
+	user.LastLoginUTC = time.Now().UTC()
 	user.LastSeenUTC = time.Now().UTC()
 	if err := a.Model.Invoke(r.Context()).Upsert(&user); err != nil {
 		return r.Views.InternalError(err)

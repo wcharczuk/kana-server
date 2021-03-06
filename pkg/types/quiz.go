@@ -14,8 +14,12 @@ import (
 type Quiz struct {
 	// ID is a unique identifier for the quiz.
 	ID uuid.UUID `db:"id,pk"`
+	// UserID is the user the quiz corresponds to.
+	UserID uuid.UUID `db:"user_id"`
 	// CreatedUTC is the time the quiz was created.
 	CreatedUTC time.Time `db:"created_utc"`
+	// LastAnsweredUTC is the last time the quiz was answered.
+	LastAnsweredUTC time.Time `db:"last_answered_utc"`
 	// Hiragana indicates if we should include prompts from the hiragana set.
 	Hiragana bool `db:"hiragana"`
 	// Katakana indicates if we should include prompts from the katakana set.
@@ -113,10 +117,11 @@ func (q Quiz) PromptStats() (output []*PromptStats) {
 }
 
 // NewTestQuiz returns a new test quiz.
-func NewTestQuiz() *Quiz {
+func NewTestQuiz(userID uuid.UUID) *Quiz {
 	prompts := kana.SelectCount(kana.Merge(kana.Hiragana, kana.Katakana), 10)
 	return &Quiz{
 		ID:               uuid.V4(),
+		UserID:           userID,
 		CreatedUTC:       time.Now().UTC(),
 		Hiragana:         true,
 		Katakana:         true,

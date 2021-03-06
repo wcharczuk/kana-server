@@ -6,3 +6,6 @@ run-reload:
 
 db:
 	@go run migrations/main.go
+
+migrate:
+	@go run migrations/main.go --skip-create-database

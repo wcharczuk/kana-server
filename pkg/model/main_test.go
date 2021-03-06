@@ -42,9 +42,16 @@ func NewTest(t *testing.T) (*assert.Assertions, *model.Manager, func()) {
 	}
 }
 
+// CreateTestUser creates a test user.
+func CreateTestUser(its *assert.Assertions, mgr *model.Manager) *types.User {
+	u0 := types.NewTestUser()
+	its.Nil(mgr.Invoke(its.Background()).Create(&u0))
+	return &u0
+}
+
 // CreateTestQuiz creates a test quiz.
-func CreateTestQuiz(its *assert.Assertions, mgr *model.Manager) *types.Quiz {
-	q0 := types.NewTestQuiz()
+func CreateTestQuiz(its *assert.Assertions, mgr *model.Manager, user *types.User) *types.Quiz {
+	q0 := types.NewTestQuiz(user.ID)
 	its.Nil(mgr.Invoke(its.Background()).Create(q0))
 
 	q0r0 := types.NewTestQuizResultCorrect(q0)

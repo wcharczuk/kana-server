@@ -7,14 +7,14 @@ import (
 	"github.com/blend/go-sdk/uuid"
 	"github.com/blend/go-sdk/web"
 
-	"github.com/wcharczuk/kana-server/pkg/interfaces"
 	"github.com/wcharczuk/kana-server/pkg/kana"
+	"github.com/wcharczuk/kana-server/pkg/model"
 	"github.com/wcharczuk/kana-server/pkg/types"
 )
 
 // Quiz is the quiz controller.
 type Quiz struct {
-	Model interfaces.Model
+	Model model.Manager
 }
 
 // Register adds the controller methods to the app.
@@ -25,18 +25,26 @@ func (q Quiz) Register(app *web.App) {
 		"_views/stats.html",
 		"_views/stats_quiz.html",
 	)
-	app.GET("/quiz.new", q.getQuizNew)
-	app.POST("/quiz", q.postQuiz)
-	app.GET("/quiz/:id", q.getQuizPrompt)
-	app.POST("/quiz/:id/answer", q.postQuizAnswer)
 
-	app.GET("/stats", q.getStats)
-	app.GET("/stats/:id", q.getQuizStats)
+	app.GET("/quiz.new", q.getQuizNew, web.SessionRequired)
+	app.POST("/quiz", q.postQuiz, web.SessionRequired)
+	app.GET("/quiz/:id", q.getQuizPrompt, web.SessionRequired)
+	app.POST("/quiz/:id/answer", q.postQuizAnswer, web.SessionRequired)
+	app.GET("/stats", q.getStats, web.SessionRequired)
+	app.GET("/stats/:id", q.getQuizStats, web.SessionRequired)
+}
+
+func (q Quiz) getUserID(r *web.Ctx) (uuid.UUID, error) {
+	return uuid.Parse(r.Session.UserID)
 }
 
 // GET /stats
 func (q Quiz) getStats(r *web.Ctx) web.Result {
-	all, err := q.Model.AllQuzzes(r.Context())
+	userID, err := q.getUserID(r)
+	if err != nil {
+		return r.Views.InternalError(err)
+	}
+	all, err := q.Model.AllQuzzes(r.Context(), userID)
 	if err != nil {
 		return r.Views.InternalError(err)
 	}
@@ -45,6 +53,10 @@ func (q Quiz) getStats(r *web.Ctx) web.Result {
 
 // GET /stats/:id
 func (q Quiz) getQuizStats(r *web.Ctx) web.Result {
+	userID, err := q.getUserID(r)
+	if err != nil {
+		return r.Views.InternalError(err)
+	}
 	quizID, err := web.UUIDValue(r.RouteParam("id"))
 	if err != nil {
 		return r.Views.BadRequest(err)
@@ -53,7 +65,7 @@ func (q Quiz) getQuizStats(r *web.Ctx) web.Result {
 	if err != nil {
 		return r.Views.InternalError(err)
 	}
-	if !found {
+	if !found || !quiz.UserID.Equal(userID) {
 		return r.Views.NotFound()
 	}
 	return r.Views.View("stats_quiz", quiz)
@@ -66,6 +78,11 @@ func (q Quiz) getQuizNew(r *web.Ctx) web.Result {
 
 // POST /quiz
 func (q Quiz) postQuiz(r *web.Ctx) web.Result {
+	userID, err := q.getUserID(r)
+	if err != nil {
+		return r.Views.InternalError(err)
+	}
+
 	maxQuestions, _ := web.IntValue(r.Param("maxQuestions"))
 	maxPrompts, _ := web.IntValue(r.Param("maxPrompts"))
 	maxRepeatHistory, _ := web.IntValue(r.Param("maxRepeatHistory"))
@@ -89,6 +106,7 @@ func (q Quiz) postQuiz(r *web.Ctx) web.Result {
 
 	quiz := types.Quiz{
 		ID:               uuid.V4(),
+		UserID:           userID,
 		CreatedUTC:       time.Now().UTC(),
 		Hiragana:         includeHiragana != "",
 		Katakana:         includeKatakana != "",
@@ -109,6 +127,10 @@ func (q Quiz) postQuiz(r *web.Ctx) web.Result {
 
 // GET /quiz/:id
 func (q Quiz) getQuizPrompt(r *web.Ctx) web.Result {
+	userID, err := q.getUserID(r)
+	if err != nil {
+		return r.Views.InternalError(err)
+	}
 	quizID, err := web.UUIDValue(r.Param("id"))
 	if err != nil {
 		return r.Views.BadRequest(err)
@@ -117,7 +139,7 @@ func (q Quiz) getQuizPrompt(r *web.Ctx) web.Result {
 	if err != nil {
 		return r.Views.InternalError(err)
 	}
-	if !found {
+	if !found || !quiz.UserID.Equal(userID) {
 		return r.Views.NotFound()
 	}
 
@@ -147,6 +169,10 @@ func (q Quiz) getQuizPrompt(r *web.Ctx) web.Result {
 
 // POST /quiz/:id/answer
 func (q Quiz) postQuizAnswer(r *web.Ctx) web.Result {
+	userID, err := q.getUserID(r)
+	if err != nil {
+		return r.Views.InternalError(err)
+	}
 	quizID, err := web.UUIDValue(r.Param("id"))
 	if err != nil {
 		return r.Views.BadRequest(err)
@@ -155,7 +181,7 @@ func (q Quiz) postQuizAnswer(r *web.Ctx) web.Result {
 	if err != nil {
 		return r.Views.InternalError(err)
 	}
-	if !found {
+	if !found || !quiz.UserID.Equal(userID) {
 		return r.Views.NotFound()
 	}
 	createdUTC, err := web.Int64Value(r.Param("createdUTC"))
@@ -177,6 +203,7 @@ func (q Quiz) postQuizAnswer(r *web.Ctx) web.Result {
 
 	quizResult := types.QuizResult{
 		ID:          uuid.V4(),
+		UserID:      userID,
 		QuizID:      quiz.ID,
 		CreatedUTC:  time.Unix(0, createdUTC).UTC(),
 		AnsweredUTC: time.Now().UTC(),
@@ -189,6 +216,7 @@ func (q Quiz) postQuizAnswer(r *web.Ctx) web.Result {
 	} else {
 		kana.IncreaseWeight(quiz.PromptWeights, prompt)
 	}
+	quiz.LastAnsweredUTC = time.Now().UTC()
 	quiz.PromptHistory = kana.ListAddFixedLength(quiz.PromptHistory, prompt, quiz.MaxRepeatHistory)
 	if err := q.Model.UpdateQuiz(r.Context(), quiz); err != nil {
 		return r.Views.InternalError(err)
