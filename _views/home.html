@@ -45,7 +45,7 @@
             {{ range $index, $quiz := .ViewModel.Quizzes }}
                     {{ $stats := $quiz.Stats }}
                     <tr>
-                        <td><a href="/stats/{{$quiz.ID }}">{{ $quiz.CreatedUTC | time_format $dateFormat }}</a></td>
+                        <td><a href="/home/{{$quiz.ID }}">{{ $quiz.CreatedUTC | time_format $dateFormat }}</a></td>
                         <td>{{ template "quiz_settings" $quiz }}</td>
                         <td>{{ $quiz.MaxQuestions}}</td>
                         <td>{{ $quiz.MaxPrompts }}</td>

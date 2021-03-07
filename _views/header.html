@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>Kana Server</title>
+	<title>Kana Quiz</title>
 	<meta name="referrer" content="no-referrer" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 	<meta name="robots" content="noimageindex">
@@ -22,11 +22,12 @@
             </div>
             <div class="bp3-navbar-group bp3-align-right">
             {{ if .Ctx.Session }}
+                {{ $user := .Ctx.Session.State.User }}
                 <a href="/home" class="bp3-button bp3-minimal bp3-icon-home" title="Home">Home</a>
                 <span class="bp3-navbar-divider"></span>
                 <a href="/quiz.new" class="bp3-button bp3-minimal bp3-intent-success bp3-icon-add" title="Start New Quiz"></a>
                 <span class="bp3-navbar-divider"></span>
-                <span class="bp3-navbar-item"><img class="nav-profile-picture" src="{{ .Ctx.Session.State.User.PictureURL }}"/></span>
+                <span class="bp3-navbar-item"><img class="nav-profile-picture" src="{{ $user.PictureURL }}" title="{{ $user.Email }}"/></span>
                 <span class="bp3-navbar-divider"></span>
                 <a href="/logout" class="bp3-button bp3-minimal bp3-intent-primary bp3-icon-log-out" title="Log Out"></a>
                 </div>
