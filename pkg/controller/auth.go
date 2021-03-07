@@ -17,7 +17,7 @@ import (
 
 const (
 	// SessionKeyUser is the session state key where the user reference is held.
-	SessionKeyUser = "__user__"
+	SessionKeyUser = "User"
 )
 
 // Auth is the auth controller.
@@ -111,7 +111,7 @@ func (a Auth) mustSecret() []byte {
 }
 
 func (a Auth) authedRedirect() web.Result {
-	return web.RedirectWithMethod(http.MethodGet, "/checks")
+	return web.RedirectWithMethod(http.MethodGet, "/home")
 }
 
 func (a Auth) fetchHandler(jwtHandler web.AuthManagerFetchSessionHandler) web.AuthManagerFetchSessionHandler {
@@ -127,6 +127,9 @@ func (a Auth) fetchHandler(jwtHandler web.AuthManagerFetchSessionHandler) web.Au
 		}
 		if !found {
 			return nil, nil
+		}
+		if session.State == nil {
+			session.State = make(map[string]interface{})
 		}
 		session.State[SessionKeyUser] = &user
 		return session, nil

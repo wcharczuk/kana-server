@@ -1,3 +1,7 @@
+nav.bp3-navbar {
+    margin-bottom: 25px;
+}
+
 .align-left {
     text-align: left;
 }
@@ -25,23 +29,20 @@
     text-decoration: underline;
 }
 
-.nav {
-    padding-top: 10px;
-    height: 75px;
-    border-bottom: 1px solid #efefef;
-    margin-bottom: 15px;
-}
-
-.nav .nav-hero a {
-    text-decoration: none;
-}
-.nav .nav-hero a:hover {
-    text-decoration: none;
-}
-
 .bp3-card {
     margin-bottom: 15px;
 }
+
+/* navbar stuff */
+
+.nav-profile-picture {
+    max-height: 30px;
+    max-width: 30;
+    border-radius: 30px;
+    border: 1px solid #efefef;
+}
+
+/* end navbar stuff */
 
 /* specific page sections */
 

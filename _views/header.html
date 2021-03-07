@@ -15,15 +15,26 @@
 	<link rel="stylesheet" type="text/css" href="/static/css/site.css" />
 </head>
 <body>
-    <nav class="nav container row">
-        <div class="four columns">
-            <h1 class="nav-hero"><a href="/">Kana Quiz</a></h1>
+    <nav class="bp3-navbar">
+        <div class="twelve columns">
+            <div class="bp3-navbar-group bp3-align-left">
+                <div class="bp3-navbar-heading"><a href="/home" title="Home">Kana Quiz</a></div>
+            </div>
+            <div class="bp3-navbar-group bp3-align-right">
+            {{ if .Ctx.Session }}
+                <a href="/home" class="bp3-button bp3-minimal bp3-icon-home" title="Home">Home</a>
+                <a href="/stats" class="bp3-button bp3-minimal bp3-icon-numerical" title="Stats">Stats</a>
+                <span class="bp3-navbar-divider"></span>
+                <a href="/quiz.new" class="bp3-button bp3-minimal bp3-intent-success bp3-icon-add" title="Start New Quiz"></a>
+                <span class="bp3-navbar-divider"></span>
+                <span class="bp3-navbar-item"><img class="nav-profile-picture" src="{{ .Ctx.Session.State.User.PictureURL }}"/></span>
+                <span class="bp3-navbar-divider"></span>
+                <a href="/logout" class="bp3-button bp3-minimal bp3-intent-primary bp3-icon-log-out" title="Log Out"></a>
+                </div>
+            {{ else }}
+                <a href="/login" class="bp3-button bp3-minimal bp3-intent-primary bp3-icon-log-in" title="Log In"></a>
+            {{ end }}
+            </div>
         </div>
-        {{ if .Ctx.Session }}
-        <div class="eight columns align-right">
-            <a href="/stats" class="bp3-button">Stats</a>
-            <a href="/quiz.new" class="bp3-button bp3-intent-success">Start new quiz</a>
-        </div>
-        {{ end }}
     </nav>
 {{end}}
