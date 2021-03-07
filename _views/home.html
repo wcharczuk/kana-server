@@ -31,7 +31,7 @@
                     <tr>
                         <th>Taken</th>
                         <th>Prompts</th>
-                        <th>Questions</th>
+                        <th>Max Questions</th>
                         <th>Prompts</th>
                         <th>History</th>
                         <th>Total</th>
@@ -47,7 +47,7 @@
                     <tr>
                         <td><a href="/home/{{$quiz.ID }}">{{ $quiz.CreatedUTC | time_format $dateFormat }}</a></td>
                         <td>{{ template "quiz_settings" $quiz }}</td>
-                        <td>{{ $quiz.MaxQuestions}}</td>
+                        <td>{{ if $quiz.MaxQuestions}}{{$quiz.MaxQuestions}}{{ else }}<span>-</span>{{end}}</td>
                         <td>{{ $quiz.MaxPrompts }}</td>
                         <td>{{ $quiz.MaxRepeatHistory }}</td>
                         <td>{{ $stats.Total }}</td>
