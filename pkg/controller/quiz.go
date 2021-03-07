@@ -7,6 +7,7 @@ import (
 	"github.com/blend/go-sdk/uuid"
 	"github.com/blend/go-sdk/web"
 
+	"github.com/wcharczuk/kana-server/pkg/config"
 	"github.com/wcharczuk/kana-server/pkg/kana"
 	"github.com/wcharczuk/kana-server/pkg/model"
 	"github.com/wcharczuk/kana-server/pkg/types"
@@ -14,70 +15,31 @@ import (
 
 // Quiz is the quiz controller.
 type Quiz struct {
-	Model model.Manager
+	BaseController
+	Config config.Config
+	Model  model.Manager
 }
 
 // Register adds the controller methods to the app.
 func (q Quiz) Register(app *web.App) {
 	app.Views.AddPaths(
 		"_views/quiz.html",
-		"_views/new_quiz.html",
-		"_views/stats.html",
-		"_views/stats_quiz.html",
+		"_views/quiz_new.html",
 	)
 
 	app.GET("/quiz.new", q.getQuizNew, web.SessionRequired)
-	app.POST("/quiz", q.postQuiz, web.SessionRequired)
+	app.POST("/quiz.new", q.postQuizNew, web.SessionRequired)
 	app.GET("/quiz/:id", q.getQuizPrompt, web.SessionRequired)
 	app.POST("/quiz/:id/answer", q.postQuizAnswer, web.SessionRequired)
-	app.GET("/stats", q.getStats, web.SessionRequired)
-	app.GET("/stats/:id", q.getQuizStats, web.SessionRequired)
-}
-
-func (q Quiz) getUserID(r *web.Ctx) (uuid.UUID, error) {
-	return uuid.Parse(r.Session.UserID)
-}
-
-// GET /stats
-func (q Quiz) getStats(r *web.Ctx) web.Result {
-	userID, err := q.getUserID(r)
-	if err != nil {
-		return r.Views.InternalError(err)
-	}
-	all, err := q.Model.AllQuzzes(r.Context(), userID)
-	if err != nil {
-		return r.Views.InternalError(err)
-	}
-	return r.Views.View("stats", all)
-}
-
-// GET /stats/:id
-func (q Quiz) getQuizStats(r *web.Ctx) web.Result {
-	userID, err := q.getUserID(r)
-	if err != nil {
-		return r.Views.InternalError(err)
-	}
-	quizID, err := web.UUIDValue(r.RouteParam("id"))
-	if err != nil {
-		return r.Views.BadRequest(err)
-	}
-	quiz, found, err := q.Model.GetQuiz(r.Context(), quizID)
-	if err != nil {
-		return r.Views.InternalError(err)
-	}
-	if !found || !quiz.UserID.Equal(userID) {
-		return r.Views.NotFound()
-	}
-	return r.Views.View("stats_quiz", quiz)
 }
 
 // GET /quiz.new
 func (q Quiz) getQuizNew(r *web.Ctx) web.Result {
-	return r.Views.View("new_quiz", nil)
+	return r.Views.View("quiz_new", nil)
 }
 
-// POST /quiz
-func (q Quiz) postQuiz(r *web.Ctx) web.Result {
+// POST /quiz.new
+func (q Quiz) postQuizNew(r *web.Ctx) web.Result {
 	userID, err := q.getUserID(r)
 	if err != nil {
 		return r.Views.InternalError(err)

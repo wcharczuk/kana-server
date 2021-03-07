@@ -1,5 +1,6 @@
 package kana
 
+// KatakanaWords are words in katakana to quiz.
 var KatakanaWords = map[string]string{
 	"カメラ":       "camera",
 	"コーヒー":      "coffee",

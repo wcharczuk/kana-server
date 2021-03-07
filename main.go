@@ -31,7 +31,7 @@ func main() {
 	if err != nil {
 		logger.MaybeFatalExit(log, err)
 	}
-	if err := conn.Open(); err != nil {
+	if err = conn.Open(); err != nil {
 		logger.MaybeFatalExit(log, err)
 	}
 	log.Infof("using database dsn: %s", cfg.DB.CreateLoggingDSN())
@@ -52,11 +52,12 @@ func main() {
 	}
 	server.Register(
 		controller.Index{Config: cfg},
+		controller.Home{Config: cfg, Model: modelMgr},
 		controller.Auth{Config: cfg, Model: modelMgr, OAuth: oauthMgr},
-		controller.Quiz{Model: modelMgr},
+		controller.Quiz{Config: cfg, Model: modelMgr},
 	)
-	// disable later
-	server.Views.LiveReload = true
+
+	server.Views.LiveReload = !cfg.Meta.IsProdlike()
 	if err := graceful.Shutdown(server); err != nil {
 		logger.MaybeFatalExit(log, err)
 	}

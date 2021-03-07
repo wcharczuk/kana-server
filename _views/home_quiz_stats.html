@@ -1,4 +1,4 @@
-{{ define "stats_quiz" }} {{ template "header" . }}
+{{ define "home_quiz_stats" }} {{ template "header" . }}
 {{ $dateFormat := "2006-01-02 15:04Z"}}
 {{ $stats := .ViewModel.Stats }}
 {{ $promptStats := .ViewModel.PromptStats }}
@@ -12,7 +12,7 @@
             <table class="bp3-html-table bp3-html-table-condensed bp3-html-table-striped u-full-width u-max-full-width">
                 <thead>
                     <tr>
-                        <th>Created</th>
+                        <th>Taken</th>
                         <th>Prompts</th>
                         <th>Questions</th>
                         <th>Prompts</th>
@@ -69,6 +69,10 @@
                         <td>{{ $prompt.ElapsedAverage | duration_round_millis }}</td>
                         <td>{{ $prompt.ElapsedP90 | duration_round_millis }}</td>
                         <td>{{ $prompt.ElapsedMax | duration_round_millis }}</td>
+                    </tr>
+                    {{ else }}
+                    <tr>
+                        <td colspan="9">No Responses</td>
                     </tr>
                     {{ end }}
                 </tbody>

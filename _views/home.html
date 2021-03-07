@@ -1,11 +1,68 @@
+
 {{ define "home" }} {{ template "header" . }}
-<div class="container">
+{{ $dateFormat := "2006-01-02 15:04Z"}}
+<div class="container stats">
+    <ul class="bp3-breadcrumbs">
+        <li><a class="bp3-breadcrumb  bp3-breadcrumb-current" href="/stats">Home</a></li>
+    </ul>
+    <div class="home-stats row">
+        <div class="three columns bp3-card">
+            <h3 class="align-center">{{ .ViewModel.TotalQuizzes }}</h3>
+            <h6 class="align-center">Total Quizzes</h6>
+        </div>
+        <div class="three columns bp3-card">
+            <h3 class="align-center">{{ .ViewModel.TotalQuizResults }}</h3>
+            <h6 class="align-center">Total Answers</h6>
+        </div>
+        <div class="three columns bp3-card">
+            <h3 class="align-center">{{ .ViewModel.TotalQuizResultsCorrect }}</h3>
+            <h6 class="align-center">Total Correct</h6>
+        </div>
+        <div class="three columns bp3-card">
+            <h3 class="align-center">{{ .ViewModel.TotalQuizCorrectPct | printf "%0.2f" }}%</h3>
+            <h6 class="align-center">Total Correct</h6>
+        </div>
+
+    </div>
     <div class="row">
         <div class="twelve columns">
-            <h4 class="bp3-heading">Welcome!</h4>
-            <p>The goal of this app is to help you drill kana, specifically Hiragana and Katakana.</p>
-            <p>You can also optionaly include some short words to help with reading groups of kana.</p>
-            <p>To get started, click the <code class="text-intent-success">Start New Quiz</code> button in the upper righthand side.</p>
+            <table class="bp3-html-table bp3-html-table-condensed bp3-html-table-striped u-full-width u-max-full-width">
+                <thead>
+                    <tr>
+                        <th>Taken</th>
+                        <th>Prompts</th>
+                        <th>Questions</th>
+                        <th>Prompts</th>
+                        <th>History</th>
+                        <th>Total</th>
+                        <th>Correct</th>
+                        <th>Pct. Correct</th>
+                        <th>P90 Elapsed</th>
+                        <th>Min/Max Elapsed</th>
+                    </tr>
+                </thead>
+                <tbody>
+            {{ range $index, $quiz := .ViewModel.Quizzes }}
+                    {{ $stats := $quiz.Stats }}
+                    <tr>
+                        <td><a href="/stats/{{$quiz.ID }}">{{ $quiz.CreatedUTC | time_format $dateFormat }}</a></td>
+                        <td>{{ template "quiz_settings" $quiz }}</td>
+                        <td>{{ $quiz.MaxQuestions}}</td>
+                        <td>{{ $quiz.MaxPrompts }}</td>
+                        <td>{{ $quiz.MaxRepeatHistory }}</td>
+                        <td>{{ $stats.Total }}</td>
+                        <td>{{ $stats.Correct }}</td>
+                        <td>{{ $stats.PercentCorrect | printf "%.2f" }}%</td>
+                        <td>{{ $stats.ElapsedP90 | duration_round_millis }}</td>
+                        <td>{{ $stats.ElapsedMin | duration_round_millis }} / {{ $stats.ElapsedMax | duration_round_millis }}</td>
+                    </tr>
+            {{ else }}
+                    <tr>
+                        <td colspan="12">No Quizzes Taken</td>
+                    </tr>
+            {{ end }}
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

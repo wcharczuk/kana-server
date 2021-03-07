@@ -19,10 +19,10 @@ var (
 	quizResultCols      = db.Columns(types.QuizResult{})
 	quizResultTableName = types.QuizResult{}.TableName()
 
-	getQuizzesForUserQuery            = fmt.Sprintf("SELECT %s FROM %s WHERE user_id = $1 ORDER BY created_utc desc", quizCols.ColumnNamesCSV(), quizTableName)
-	getQuizzesForUserQuizResultsQuery = fmt.Sprintf("SELECT %s FROM %s WHERE user_id = $1", quizResultCols.ColumnNamesCSV(), quizResultTableName)
-	getQuizResultsQuery               = fmt.Sprintf("SELECT %s FROM %s WHERE quiz_id = $1", quizResultCols.ColumnNamesCSV(), quizResultTableName)
-	getUserByEmailQuery               = fmt.Sprintf("SELECT %s FROM %s WHERE email = $1", userCols.ColumnNamesCSV(), userTableName)
+	getQuizzesForUserQuery     = fmt.Sprintf("SELECT %s FROM %s WHERE user_id = $1 ORDER BY created_utc desc", quizCols.ColumnNamesCSV(), quizTableName)
+	getQuizResultsForUserQuery = fmt.Sprintf("SELECT %s FROM %s WHERE user_id = $1", quizResultCols.ColumnNamesCSV(), quizResultTableName)
+	getQuizResultsForQuizQuery = fmt.Sprintf("SELECT %s FROM %s WHERE quiz_id = $1", quizResultCols.ColumnNamesCSV(), quizResultTableName)
+	getUserByEmailQuery        = fmt.Sprintf("SELECT %s FROM %s WHERE email = $1", userCols.ColumnNamesCSV(), userTableName)
 )
 
 // New returns a new model manager.
@@ -40,7 +40,7 @@ type Manager struct {
 // AllQuzzes returns all the quizzes.
 func (m Manager) AllQuzzes(ctx context.Context, userID uuid.UUID) (output []*types.Quiz, err error) {
 	lookup := map[string]*types.Quiz{}
-	err = m.Invoke(ctx).Query(getQuizzesForUserQuery, userID).Each(func(r db.Rows) error {
+	err = m.Invoke(ctx, db.OptLabel("all_quizzes")).Query(getQuizzesForUserQuery, userID).Each(func(r db.Rows) error {
 		var q types.Quiz
 		if populateErr := db.PopulateInOrder(&q, r, quizCols); populateErr != nil {
 			return populateErr
@@ -52,7 +52,7 @@ func (m Manager) AllQuzzes(ctx context.Context, userID uuid.UUID) (output []*typ
 	if err != nil {
 		return
 	}
-	err = m.Invoke(ctx).Query(getQuizzesForUserQuizResultsQuery, userID).Each(func(r db.Rows) error {
+	err = m.Invoke(ctx, db.OptLabel("all_quizzes_results")).Query(getQuizResultsForUserQuery, userID).Each(func(r db.Rows) error {
 		var qr types.QuizResult
 		if populateErr := db.PopulateInOrder(&qr, r, quizResultCols); populateErr != nil {
 			return populateErr
@@ -67,6 +67,12 @@ func (m Manager) AllQuzzes(ctx context.Context, userID uuid.UUID) (output []*typ
 	return
 }
 
+// AllQuizResults returns all the quiz results for a given user.
+func (m Manager) AllQuizResults(ctx context.Context, userID uuid.UUID) (output []types.QuizResult, err error) {
+	err = m.Invoke(ctx, db.OptLabel("all_quiz_results")).Query(getQuizResultsForUserQuery, userID).OutMany(&output)
+	return
+}
+
 // CreateQuiz creates a quiz.
 func (m Manager) CreateQuiz(ctx context.Context, q types.Quiz) error {
 	return m.Invoke(ctx).Create(&q)
@@ -78,7 +84,7 @@ func (m Manager) GetQuiz(ctx context.Context, id uuid.UUID) (output types.Quiz, 
 	if err != nil || !found {
 		return
 	}
-	err = m.Invoke(ctx).Query(getQuizResultsQuery, id).Each(func(r db.Rows) error {
+	err = m.Invoke(ctx, db.OptLabel("get_quiz_results_for_quiz")).Query(getQuizResultsForQuizQuery, id).Each(func(r db.Rows) error {
 		var qr types.QuizResult
 		if populateErr := db.PopulateInOrder(&qr, r, quizResultCols); populateErr != nil {
 			return populateErr
@@ -102,6 +108,6 @@ func (m Manager) AddQuizResult(ctx context.Context, qr types.QuizResult) error {
 
 // GetUserByEmail gets a user by email.
 func (m Manager) GetUserByEmail(ctx context.Context, email string) (output types.User, found bool, err error) {
-	found, err = m.Invoke(ctx).Query(getUserByEmailQuery, email).Out(&output)
+	found, err = m.Invoke(ctx, db.OptLabel("get_user_by_email")).Query(getUserByEmailQuery, email).Out(&output)
 	return
 }

@@ -15,13 +15,9 @@ import (
 	"github.com/wcharczuk/kana-server/pkg/types"
 )
 
-const (
-	// SessionKeyUser is the session state key where the user reference is held.
-	SessionKeyUser = "User"
-)
-
 // Auth is the auth controller.
 type Auth struct {
+	BaseController
 	Config config.Config
 	OAuth  *oauth.Manager
 	Model  model.Manager
@@ -73,7 +69,7 @@ func (a Auth) oauthGoogle(r *web.Ctx) web.Result {
 	}
 	user.LastLoginUTC = time.Now().UTC()
 	user.LastSeenUTC = time.Now().UTC()
-	if err := a.Model.Invoke(r.Context()).Upsert(&user); err != nil {
+	if err = a.Model.Invoke(r.Context()).Upsert(&user); err != nil {
 		return r.Views.InternalError(err)
 	}
 	sess, err := r.Auth.Login(user.ID.String(), r)

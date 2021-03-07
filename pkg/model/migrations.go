@@ -13,6 +13,10 @@ func Migrations() *migration.Suite {
 	)
 }
 
+//
+// specific table definitions
+//
+
 func users() *migration.Group {
 	return migration.NewGroupWithAction(
 		migration.TableNotExists("users"),

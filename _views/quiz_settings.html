@@ -1,0 +1,13 @@
+{{ define "quiz_settings" }}
+<span class="quiz-settings">
+    {{ if .Hiragana }}
+    <span class="quiz-setting">Hiragana</span>
+    {{ end }}
+    {{ if .Katakana }}
+    <span class="quiz-setting">Katakana</span>
+    {{ end }}
+    {{ if .KatakanaWords }}
+    <span class="quiz-setting">Katakana Words</span>
+    {{ end }}
+</span>
+{{ end }}
