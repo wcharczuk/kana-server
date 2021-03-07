@@ -7,6 +7,7 @@ import (
 	"github.com/blend/go-sdk/configmeta"
 	"github.com/blend/go-sdk/configutil"
 	"github.com/blend/go-sdk/db"
+	"github.com/blend/go-sdk/ex"
 	"github.com/blend/go-sdk/logger"
 	"github.com/blend/go-sdk/oauth"
 	"github.com/blend/go-sdk/web"
@@ -38,5 +39,9 @@ func (c *Config) Resolve(ctx context.Context) error {
 
 // GetSecret decodes the config secret.
 func (c Config) GetSecret() ([]byte, error) {
-	return base64.RawURLEncoding.DecodeString(c.Secret)
+	secret, err := base64.RawURLEncoding.DecodeString(c.Secret)
+	if err != nil {
+		return nil, ex.New(err)
+	}
+	return secret, nil
 }
