@@ -95,7 +95,7 @@ func main() {
 			BaseManager: dbutil.NewBaseManager(conn),
 		}
 		app.Register(
-			controller.Index{Config: cfg},
+			controller.Index{Config: cfg, Model: modelMgr},
 			controller.Home{Config: cfg, Model: modelMgr},
 			controller.Auth{Config: cfg, Model: modelMgr, OAuth: oauthMgr},
 			controller.Quiz{Config: cfg, Model: modelMgr},
