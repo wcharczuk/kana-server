@@ -53,7 +53,7 @@ func (q Quiz) IsZero() bool {
 // LatestResult returns the latest result.
 func (q Quiz) LatestResult() *QuizResult {
 	if len(q.Results) > 0 {
-		return &q.Results[len(q.Results)-1]
+		return &q.Results[0]
 	}
 	return nil
 }
