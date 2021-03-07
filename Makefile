@@ -5,7 +5,7 @@ run-reload:
 	@reflex -s -- go run main.go
 
 db:
-	@go run migrations/main.go
+	@go run main.go --create-database=true --migrations=true --server=false
 
 migrate:
-	@go run migrations/main.go --skip-create-database
+	@go run main.go --create-database=false --migrations=true --server=false
