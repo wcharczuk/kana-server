@@ -38,5 +38,5 @@ func (c *Config) Resolve(ctx context.Context) error {
 
 // GetSecret decodes the config secret.
 func (c Config) GetSecret() ([]byte, error) {
-	return base64.URLEncoding.DecodeString(c.Secret)
+	return base64.RawURLEncoding.DecodeString(c.Secret)
 }
