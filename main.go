@@ -113,7 +113,7 @@ func main() {
 
 func httpsUpgrade(action web.Action) web.Action {
 	return func(r *web.Ctx) web.Result {
-		if r.Request.URL.Scheme == webutil.SchemeHTTP {
+		if r.Request.Header.Get(webutil.HeaderXForwardedProto) == webutil.SchemeHTTP {
 			webutil.HTTPSRedirectFunc(r.Response, r.Request)
 			return nil
 		}
