@@ -34,6 +34,9 @@ func (c *Config) Resolve(ctx context.Context) error {
 		(&c.Logger).Resolve,
 		(&c.Web).Resolve,
 		configutil.SetString(&c.Secret, configutil.Env("SECRET"), configutil.String(c.Secret)),
+		configutil.SetString(&c.ServiceName, configutil.Env("SERVICE_NAME"), configutil.Env("HEROKU_APP_NAME"), configutil.String(c.ServiceName), configutil.String("kana-server")),
+		configutil.SetString(&c.Version, configutil.Env("VERSION"), configutil.Env("HEROKU_RELEASE_VERSION"), configutil.String(c.Version), configutil.String(configmeta.Version)),
+		configutil.SetString(&c.GitRef, configutil.Env("GIT_REF"), configutil.Env("HEROKU_SLUG_COMMIT"), configutil.String(c.GitRef), configutil.String(configmeta.GitRef)),
 	)
 }
 
