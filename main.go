@@ -92,6 +92,12 @@ func main() {
 			web.OptConfig(cfg.Web),
 			web.OptLog(log),
 		)
+
+		if cfg.IsProdlike() {
+			log.Info("using https upgrader")
+			app.BaseMiddleware = append(app.BaseMiddleware, httpsUpgrade)
+		}
+
 		modelMgr := model.Manager{
 			BaseManager: dbutil.NewBaseManager(conn),
 		}
@@ -102,10 +108,6 @@ func main() {
 			controller.Quiz{Config: cfg, Model: modelMgr},
 		)
 		app.Views.LiveReload = !cfg.Meta.IsProdlike()
-		if cfg.IsProdlike() {
-			log.Info("using https upgrader")
-			app.BaseMiddleware = append(app.BaseMiddleware, httpsUpgrade)
-		}
 		if err := graceful.Shutdown(app); err != nil {
 			logger.MaybeFatalExit(log, err)
 		}
