@@ -189,7 +189,7 @@ func (q Quiz) postQuizAnswer(r *web.Ctx) web.Result {
 
 	if quiz.MaxQuestions > 0 {
 		if len(quiz.Results)+1 >= quiz.MaxQuestions {
-			return web.RedirectWithMethodf(http.MethodGet, "/stats/%s", quiz.ID.String())
+			return web.RedirectWithMethodf(http.MethodGet, "/home/%s", quiz.ID.String())
 		}
 	}
 
