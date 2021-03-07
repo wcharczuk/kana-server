@@ -102,6 +102,7 @@ func main() {
 		)
 		app.Views.LiveReload = !cfg.Meta.IsProdlike()
 		if cfg.IsProdlike() {
+			log.Info("using https upgrader")
 			app.BaseMiddleware = append(app.BaseMiddleware, httpsUpgrade)
 		}
 		if err := graceful.Shutdown(app); err != nil {
