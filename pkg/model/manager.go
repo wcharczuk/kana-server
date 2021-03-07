@@ -20,7 +20,7 @@ var (
 	quizResultTableName = types.QuizResult{}.TableName()
 
 	getQuizzesForUserQuery     = fmt.Sprintf("SELECT %s FROM %s WHERE user_id = $1 ORDER BY created_utc desc", quizCols.ColumnNamesCSV(), quizTableName)
-	getQuizResultsForUserQuery = fmt.Sprintf("SELECT %s FROM %s WHERE user_id = $1", quizResultCols.ColumnNamesCSV(), quizResultTableName)
+	getQuizResultsForUserQuery = fmt.Sprintf("SELECT %s FROM %s WHERE user_id = $1 ORDER BY created_utc desc", quizResultCols.ColumnNamesCSV(), quizResultTableName)
 	getQuizResultsForQuizQuery = fmt.Sprintf("SELECT %s FROM %s WHERE quiz_id = $1", quizResultCols.ColumnNamesCSV(), quizResultTableName)
 	getUserByEmailQuery        = fmt.Sprintf("SELECT %s FROM %s WHERE email = $1", userCols.ColumnNamesCSV(), userTableName)
 )
