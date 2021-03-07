@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"strings"
 
 	"github.com/blend/go-sdk/configutil"
 	"github.com/blend/go-sdk/db"
@@ -115,7 +116,7 @@ func httpsUpgrade(action web.Action) web.Action {
 	return func(r *web.Ctx) web.Result {
 		logger.MaybeDebugfContext(r.Context(), r.App.Log, "sniffing headers %s: %q", webutil.HeaderXForwardedProto, r.Request.Header.Get(webutil.HeaderXForwardedProto))
 		logger.MaybeDebugfContext(r.Context(), r.App.Log, "sniffing headers %s: %q", webutil.HeaderXForwardedScheme, r.Request.Header.Get(webutil.HeaderXForwardedScheme))
-		if r.Request.Header.Get(webutil.HeaderXForwardedProto) == webutil.SchemeHTTP {
+		if strings.EqualFold(r.Request.Header.Get(webutil.HeaderXForwardedProto), webutil.SchemeHTTP) {
 			webutil.HTTPSRedirectFunc(r.Response, r.Request)
 			return nil
 		}
