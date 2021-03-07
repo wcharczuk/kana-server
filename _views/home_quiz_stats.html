@@ -79,5 +79,45 @@
             </table>
         </div>
     </div>
+    <div class="row">
+        <div class="twelve columns">
+            <table class="bp3-html-table bp3-html-table-condensed bp3-html-table-striped u-full-width u-max-full-width">
+                <thead>
+                    <tr>
+                        <th>Prompted</th>
+                        <th>Answered</th>
+                        <th>Elapsed</th>
+                        <th>Prompt</th>
+                        <th>Expected</th>
+                        <th>Actual</th>
+                        <th>Correct</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{ range $result := .ViewModel.Results }}
+                    <tr>
+                        <td>{{ $result.CreatedUTC | time_format $dateFormat }}</td>
+                        <td>{{ $result.AnsweredUTC | time_format $dateFormat }}</td>
+                        <td>{{ $result.Elapsed | duration_round_millis }}</td>
+                        <td>{{ $result.Prompt }}</td>
+                        <td>{{ $result.Expected }}</td>
+                        <td>{{ $result.Actual }}</td>
+                        <td>
+                        {{ if $result.Correct }}
+                            <span class="text-intent-success">Correct</span>
+                        {{ else }}
+                            <span class="text-intent-danger">Incorrect</span>
+                        {{ end }}
+                        </td>
+                    </tr>
+                    {{ else }}
+                    <tr>
+                        <td colspan="9">No Responses</td>
+                    </tr>
+                    {{ end }}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 {{ template "footer" }}{{ end }}
