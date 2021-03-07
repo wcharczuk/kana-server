@@ -3,6 +3,7 @@ package config
 import (
 	"context"
 	"encoding/base64"
+	"strings"
 
 	"github.com/blend/go-sdk/configmeta"
 	"github.com/blend/go-sdk/configutil"
@@ -38,5 +39,9 @@ func (c *Config) Resolve(ctx context.Context) error {
 
 // GetSecret decodes the config secret.
 func (c Config) GetSecret() ([]byte, error) {
-	return base64.StdEncoding.DecodeString(c.Secret)
+	secret := c.Secret
+	if !strings.HasSuffix(secret, "=") {
+		secret = secret + "="
+	}
+	return base64.StdEncoding.DecodeString(secret)
 }
