@@ -32,6 +32,7 @@ func (c *Config) Resolve(ctx context.Context) error {
 		(&c.OAuth).Resolve,
 		(&c.Logger).Resolve,
 		(&c.Web).Resolve,
+		configutil.SetString(&c.Secret, configutil.Env("SECRET"), configutil.String(c.Secret)),
 	)
 }
 
