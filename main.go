@@ -12,6 +12,7 @@ import (
 	"github.com/blend/go-sdk/logger"
 	"github.com/blend/go-sdk/oauth"
 	"github.com/blend/go-sdk/web"
+	"github.com/blend/go-sdk/webutil"
 
 	"github.com/wcharczuk/kana-server/pkg/config"
 	"github.com/wcharczuk/kana-server/pkg/controller"
@@ -86,24 +87,35 @@ func main() {
 		if err != nil {
 			logger.MaybeFatalExit(log, err)
 		}
-
-		server := web.MustNew(
+		app := web.MustNew(
 			web.OptConfig(cfg.Web),
 			web.OptLog(log),
 		)
 		modelMgr := model.Manager{
 			BaseManager: dbutil.NewBaseManager(conn),
 		}
-		server.Register(
+		app.Register(
 			controller.Index{Config: cfg},
 			controller.Home{Config: cfg, Model: modelMgr},
 			controller.Auth{Config: cfg, Model: modelMgr, OAuth: oauthMgr},
 			controller.Quiz{Config: cfg, Model: modelMgr},
 		)
-
-		server.Views.LiveReload = !cfg.Meta.IsProdlike()
-		if err := graceful.Shutdown(server); err != nil {
+		app.Views.LiveReload = !cfg.Meta.IsProdlike()
+		if cfg.IsProdlike() {
+			app.BaseMiddleware = append(app.BaseMiddleware, httpsUpgrade)
+		}
+		if err := graceful.Shutdown(app); err != nil {
 			logger.MaybeFatalExit(log, err)
 		}
+	}
+}
+
+func httpsUpgrade(action web.Action) web.Action {
+	return func(r *web.Ctx) web.Result {
+		if r.Request.URL.Scheme == webutil.SchemeHTTP {
+			webutil.HTTPSRedirectFunc(r.Response, r.Request)
+			return nil
+		}
+		return action(r)
 	}
 }
